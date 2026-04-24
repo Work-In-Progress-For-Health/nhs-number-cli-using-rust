@@ -66,3 +66,30 @@ You can download a prebuilt release for Windows:
 * Windows with GNU: <target/x86_64-pc-windows-gnu/release/nhs-number-cli.exe>
 
 We aim to add more prebuilt releases soon.
+
+## Documentation
+
+Full documentation lives under [`docs/`](./docs/):
+
+* [About NHS Numbers](./docs/about-nhs-numbers.md)
+* [Installation](./docs/installation.md)
+* [Usage](./docs/usage.md)
+* [Examples](./docs/examples.md)
+* [Troubleshooting](./docs/troubleshooting.md)
+* [Architecture](./docs/architecture.md)
+* [Development](./docs/development.md)
+* [FAQ](./docs/faq.md)
+
+Runnable examples with expected-output fixtures and `run.sh` scripts
+live under [`examples/`](./examples/). Run them all with:
+
+```sh
+cargo build
+./examples/run-all.sh
+```
+
+## For AI coding agents
+
+See [`AGENTS.md`](./AGENTS.md) for conventions, the behavioural
+contract, and things to avoid when modifying this repository with the
+help of AI tools.

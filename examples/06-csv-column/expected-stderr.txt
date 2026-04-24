@@ -1,0 +1,2 @@
+Error invalid line 2. Error: validate check digit failed. NHS Number: 999 123 4561
+Error parsing line 4. Error: ParseError. Line: not-an-nhs-number

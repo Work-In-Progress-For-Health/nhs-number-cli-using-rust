@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo build *)",
+      "Bash(./target/debug/nhs-number-cli)",
+      "Bash(../../target/debug/nhs-number-cli)",
+      "Bash(chmod +x /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/01-basic/run.sh)",
+      "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/01-basic/run.sh)",
+      "Bash(chmod +x /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/07-fail-on-invalid/*.sh)",
+      "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/07-fail-on-invalid/run.sh)",
+      "Bash(xxd /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/08-crlf-windows/input-crlf.txt)",
+      "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/target/debug/nhs-number-cli)",
+      "Bash(chmod +x /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/09-counts-summary/summary.sh)",
+      "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/09-counts-summary/summary.sh)",
+      "Bash(chmod +x /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/run-all.sh)",
+      "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/run-all.sh)",
+      "Bash(cargo test *)",
+      "Bash(./examples/run-all.sh)"
+    ]
+  }
+}
