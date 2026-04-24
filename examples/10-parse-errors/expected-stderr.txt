@@ -1,0 +1,6 @@
+Error parsing line 0. Error: ParseError. Line: abcdefghij
+Error parsing line 1. Error: ParseError. Line: 1234
+Error parsing line 2. Error: ParseError. Line: 12345678901
+Error parsing line 3. Error: ParseError. Line: 999 123 456X
+Error parsing line 4. Error: ParseError. Line: 999.123.4560
+Error parsing line 5. Error: ParseError. Line:    999 123 4560

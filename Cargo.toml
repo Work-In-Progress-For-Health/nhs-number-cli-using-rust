@@ -1,16 +1,16 @@
 [package]
 name = "nhs-number-cli"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 authors = ["Joel Parker Henderson <joel.henderson@wales.nhs.uk>"]
 description = "National Health Service (NHS) number for NHS England, NHS Wales, NHS Isle of Man."
 license = "MIT OR Apache-2.0 OR GPL-2.0 OR GPL-3.0 OR BSD-3-Clause"
 repository = "https://github.com/GIG-Cymru-NHS-Wales/nhs-number-cli-using-rust/"
 readme = "README.md"
-keywords = ["GIGCymru", "NHSWales", "health", "iechyd"]
+keywords = ["health", "iechyd", "nhs"]
 categories = ["science", "data-structures", "value-formatting"]
 include = ["src/**/*", "LICENSE.md", "README.md"]
 
 [dependencies]
-nhs-number = "0.2.3"
-serde = { version = "1.0.219", features = ["derive"] }
+nhs-number = "1.0.0"
+serde = { version = "1.0.228", features = ["derive"] }
