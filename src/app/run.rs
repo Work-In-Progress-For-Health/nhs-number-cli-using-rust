@@ -25,9 +25,22 @@ use crate::types::list::*;
 pub(crate) fn run() -> Result<(), Error> {
     trace!("run");
     let _config = initialize_configuration()?;
-    let _args = initialize_arguments();
-    crate::subcommands::check_lines::check_lines();
+    let args = initialize_arguments();
+    dispatch(&args);
     Ok(())
+}
+
+/// Dispatch to a subcommand based on the parsed `Args`.
+///
+/// Default behaviour with no subcommand flag is the line validator,
+/// so callers who do nothing more than `cat input.txt | nhs-number-cli`
+/// keep working. Set `args.check_lines = Some(false)` to suppress it
+/// (currently not expressible via the CLI).
+fn dispatch(args: &Args) {
+    trace!("dispatch");
+    if args.check_lines.unwrap_or(true) {
+        crate::subcommands::check_lines::check_lines();
+    }
 }
 
 fn initialize_configuration() -> Result<Config, Error> {

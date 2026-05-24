@@ -427,11 +427,11 @@ admits more.
 * Future subcommands must be opt-in via their own flag and must not
   change the no-flag default.
 
-**Status.** Partially implemented (dispatch scaffold exists; the
-default-behaviour fallback when no flag is given is **TBD** and tracked
-as a known gap below).
+**Status.** Implemented.
 
-**Traceability.** `src/subcommands/mod.rs`; `src/app/run.rs`.
+**Traceability.** `src/subcommands/mod.rs`; `src/app/run.rs` (`dispatch`);
+`tests/test.rs` (no-flag default); `src/app/clap.rs` `test_check_lines`
+(explicit `--line-validation`).
 
 ---
 
@@ -622,12 +622,6 @@ following hold:
 These are deliberate divergences between the spec and the code at the
 time of writing. Each is tracked toward closure.
 
-* **FR-16 default-subcommand fallback.** The plumbing in
-  `src/app/run.rs` currently routes to `check_lines` unconditionally,
-  but the path uses a `subcommand::…` import that does not match the
-  `subcommands` module name. Tracked: fix the import and add a test
-  for the no-flag default. *(Documentation does not yet wait on this;
-  the contract is the contract.)*
 * **NFR-7 dependency audit.** `regex`, `glob`, `walkdir`, `strsim`,
   `rhai`, `serde_yaml`, `toml` are reserved for forthcoming features.
   Before v0.3.0, run `cargo machete` and remove any that no
