@@ -6,11 +6,34 @@ standard input and writes results to standard output and standard error.
 ## Synopsis
 
 ```
-nhs-number-cli < INPUT > STDOUT 2> STDERR
+nhs-number-cli [FLAGS] < INPUT > STDOUT 2> STDERR
 ```
 
-The tool accepts no command-line options or arguments. All input is read
-from `stdin`; there are no flags to configure.
+All payload data is read from `stdin`; flags only select *which*
+subcommand runs and how chatty the binary is. With no flags the binary
+runs the line-validation subcommand (see [Line validation](../line-validation/index.md)),
+which is the default and which most callers want.
+
+## Flags
+
+| Flag                       | Effect                                                                |
+| -------------------------- | --------------------------------------------------------------------- |
+| `-l`, `--line-validation`  | Run the line-validation subcommand explicitly. Same effect as no flag at present; reserved for forward-compatibility once other subcommands exist. |
+| `--test`                   | Print the parsed `Args` struct and resolved log level on `stdout` before running. Diagnostic only — do not pipe `--test` output into another tool. |
+| `-v…`, `--verbose…`        | Increase log verbosity. Count → level: 1=error, 2=warn, 3=info, 4=debug, 5=trace. Logs go to `stderr` via `env_logger`. |
+| `-V`, `--version`          | Print the crate version and exit.                                     |
+| `-h`, `--help`             | Print help and exit.                                                  |
+
+Flag names, short forms, and the count semantics of `--verbose` are
+public API. See [`spec.md`](../../spec.md) FR-13.
+
+## Subcommand dispatch
+
+The binary supports a single subcommand today (`check_lines`, the
+line-validation filter). Future subcommands will each be opt-in via
+their own flag; the no-flag default behaviour will not change. See
+[Architecture § subcommands](../architecture/index.md) and
+[`spec.md`](../../spec.md) FR-16.
 
 ## Input
 
@@ -128,5 +151,48 @@ cut -d, -f3 < patients.csv | tail -n +2 | nhs-number-cli
 psql -At -c "SELECT nhs_number FROM patients" | nhs-number-cli
 ```
 
-See [Examples](./examples.md) and the top-level [`examples/`](../examples)
-directory for full working recipes.
+See [Examples](../examples/index.md) and the top-level
+[`examples/`](../../examples/) directory for full working recipes.
+
+## Configuration
+
+On start-up the binary reads a TOML configuration file via the
+[`confy`](https://crates.io/crates/confy) crate from the OS-appropriate
+location:
+
+| OS         | Path                                                       |
+| ---------- | ---------------------------------------------------------- |
+| Linux      | `~/.config/nhs-number-cli/nhs-number-cli.toml`             |
+| macOS      | `~/Library/Application Support/rs.nhs-number-cli/nhs-number-cli.toml` |
+| Windows    | `%APPDATA%\nhs-number-cli\config\nhs-number-cli.toml`      |
+
+A missing file is not an error; the default config is used. A malformed
+file produces a startup error on `stderr` and exit code `1`.
+
+At the current version the only config field is `version` (schema
+versioning). Future fields will be additive only. See
+[`spec.md`](../../spec.md) FR-14.
+
+## Logging and environment variables
+
+Operational logs are routed by [`env_logger`](https://crates.io/crates/env_logger)
+to `stderr`. The default level is off — no log lines appear unless you
+opt in.
+
+Two opt-in mechanisms:
+
+```sh
+# Repeat -v to raise the level: -v=error, -vv=warn, -vvv=info, -vvvv=debug, -vvvvv=trace
+nhs-number-cli -vvv < input.txt
+
+# Or use env_logger's standard RUST_LOG syntax.
+RUST_LOG=debug nhs-number-cli < input.txt
+RUST_LOG=nhs_number_cli=trace nhs-number-cli < input.txt
+```
+
+Log lines are written to `stderr` only. They never appear on `stdout`
+and are distinguishable from per-line diagnostics because diagnostics
+begin with `Error ` (see [Error message format](#error-message-format))
+while log lines do not. See [`spec.md`](../../spec.md) FR-15.
+
+No other environment variables affect the binary's behaviour.

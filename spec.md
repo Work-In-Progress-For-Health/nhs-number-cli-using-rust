@@ -516,8 +516,11 @@ Every observable behaviour is documented in three places: this file
 (`spec.md`), the user docs (`docs/`), and a runnable example
 (`examples/`).
 
-**Status.** Implemented for FR-1 through FR-12; FR-13 through FR-16
-have spec entries here but partial coverage in `docs/` and `examples/`.
+**Status.** Implemented for `spec.md` and `docs/` across FR-1
+through FR-16. Runnable `examples/` cover FR-1 through FR-12 plus
+the no-flag default in FR-16; the explicit-flag forms in FR-13
+through FR-16 are covered by in-crate tests but not yet by runnable
+examples — that gap is tracked in § Known gaps.
 
 ## 8. Interface specifications
 
@@ -626,8 +629,10 @@ time of writing. Each is tracked toward closure.
   `rhai`, `serde_yaml`, `toml` are reserved for forthcoming features.
   Before v0.3.0, run `cargo machete` and remove any that no
   subcommand uses.
-* **NFR-10 documentation parity.** FR-13–FR-16 have partial coverage
-  in `docs/` and `examples/`. Track in the next docs PR.
+* **NFR-10 runnable examples for flags.** FR-13–FR-15 are covered in
+  `docs/usage/index.md` and in in-crate tests but lack a dedicated
+  runnable example under `examples/`. Low priority; the flags are
+  best demonstrated in passing inside other examples.
 * **CI.** No `.github/workflows/ci.yml` is currently committed. Before
   v0.3.0, add one that runs `cargo fmt`, `cargo clippy -- -D warnings`,
   `cargo test`, and `./examples/run-all.sh` on Linux, macOS, and
@@ -661,10 +666,10 @@ time of writing. Each is tracked toward closure.
 | FR-10       | `check_lines.rs` (`#[error("…")]`)              | `tests/test.rs`                           | `examples/01-basic/expected-stderr.txt` | `AGENTS/behavioural-contract.md`                            |
 | FR-11       | (stdlib I/O)                                    | (TBD)                                     | `examples/05-separate-streams/`       | `docs/usage/index.md`                                         |
 | FR-12       | `src/main.rs`                                   | (TBD)                                     | `examples/07-fail-on-invalid/`        | `docs/usage/index.md`                                         |
-| FR-13       | `src/app/clap.rs`, `src/app/args.rs`            | `src/app/clap.rs` `#[cfg(test)]`          | (TBD)                                 | `docs/usage/index.md`                                         |
-| FR-14       | `src/app/config.rs`, `src/app/confy.rs`         | `src/app/confy.rs` `#[cfg(test)]`         | (TBD)                                 | (TBD)                                                         |
-| FR-15       | `src/main.rs` (`env_logger::init`)              | (TBD)                                     | (TBD)                                 | `AGENTS/coding-style.md`                                      |
-| FR-16       | `src/app/run.rs`, `src/subcommands/mod.rs`      | (TBD)                                     | all                                   | `AGENTS/architecture.md`                                      |
+| FR-13       | `src/app/clap.rs`, `src/app/args.rs`            | `src/app/clap.rs` `#[cfg(test)]`          | (TBD: dedicated flag-demo example)    | `docs/usage/index.md` § Flags                                 |
+| FR-14       | `src/app/config.rs`, `src/app/confy.rs`         | `src/app/confy.rs` `#[cfg(test)]`         | (TBD)                                 | `docs/usage/index.md` § Configuration                         |
+| FR-15       | `src/main.rs` (`env_logger::init`)              | (TBD)                                     | (TBD)                                 | `docs/usage/index.md` § Logging, `AGENTS/coding-style.md`     |
+| FR-16       | `src/app/run.rs` (`dispatch`), `src/subcommands/mod.rs` | `tests/test.rs` (no-flag default), `src/app/clap.rs::test_check_lines` (explicit flag) | all                                   | `docs/usage/index.md` § Subcommand dispatch, `AGENTS/architecture.md` |
 | NFR-1       | `BufRead::lines` iterator                       | (constant-memory not currently asserted)  | n/a                                   | `docs/architecture/index.md`                                  |
 | NFR-2       | `Cargo.toml` (no platform-specific deps)        | manual cross-build                        | n/a                                   | `docs/installation/index.md`                                  |
 | NFR-3       | overall design                                  | `tests/test.rs`                           | `examples/06-csv-column/`             | `docs/usage/index.md`                                         |
