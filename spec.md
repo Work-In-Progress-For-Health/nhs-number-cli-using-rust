@@ -492,8 +492,9 @@ Each crate in `Cargo.toml` must have a stated reason in
 [`AGENTS/dependencies.md`](./AGENTS/dependencies.md). Audit candidates
 are removed at each release unless a concrete user story has materialised.
 
-**Status.** Partially implemented (several "reserved for future use"
-crates are currently flagged for audit).
+**Status.** Implemented. Seven speculative crates (`regex`, `glob`,
+`walkdir`, `strsim`, `rhai`, `serde_yaml`, `toml`) were removed in the
+v0.3.0 audit. Re-add only with a concrete user story.
 
 ### NFR-8 — Reproducible output
 
@@ -625,10 +626,15 @@ following hold:
 These are deliberate divergences between the spec and the code at the
 time of writing. Each is tracked toward closure.
 
-* **NFR-7 dependency audit.** `regex`, `glob`, `walkdir`, `strsim`,
-  `rhai`, `serde_yaml`, `toml` are reserved for forthcoming features.
-  Before v0.3.0, run `cargo machete` and remove any that no
-  subcommand uses.
+* **Invalid documented test numbers.** `nhs-number` 1.0.1 correctly
+  rejects `999 000 0000` and `999 123 4560` (both yield Modulus-11
+  result 10, meaning no valid check digit exists for those prefixes).
+  Both numbers appear in roughly 40 files: `README.md`, `examples/`
+  fixtures, several `docs/` pages, and `AGENTS/` references. Replace
+  with mathematically-valid numbers from the synthetic range (e.g.
+  `999 999 9999`, `999 000 0018`, `999 000 0026`, …). Tracked
+  separately; the integration test (`tests/test.rs`) already swapped
+  to `999 999 9999`.
 * **NFR-10 runnable examples for flags.** FR-13–FR-15 are covered in
   `docs/usage/index.md` and in in-crate tests but lack a dedicated
   runnable example under `examples/`. Low priority; the flags are

@@ -33,21 +33,33 @@ cargo license
 | `clap`        | Command line argument parsing. Features `string` and `wrap_help` enabled for cleaner help output. |
 | `confy`       | Boilerplate-free TOML configuration loading at the OS-appropriate path. The CLI itself does not yet *require* persisted config, but the wiring is in place for forthcoming subcommands. |
 | `serde`       | Derives `Serialize`/`Deserialize` on `Config`. Required by `confy`. |
-| `serde_yaml`  | YAML serialisation, used for forthcoming export formats. **Audit candidate** — remove if no subcommand grows a YAML output. |
-| `toml`        | TOML support. Used by `confy` (indirectly) and reserved for explicit config dumping. |
 | `thiserror`   | Derives `std::error::Error` on per-module `Error` enums. The user-visible diagnostic format flows out of `#[error("…")]`; treat it as observable. |
 | `log`         | Logging facade. Used through macros (`trace!`, `debug!`, …). |
 | `env_logger`  | Reads `RUST_LOG` and routes `log` macros to stderr. |
-| `assertables` | Process-aware assertion macros used in `#[cfg(test)]` blocks. Imported at runtime via `extern crate` so the macros are available crate-wide for test discovery. |
-| `regex`       | Reserved for forthcoming subcommands (e.g. CSV column heuristics). **Audit candidate** if no consumer appears. |
-| `glob`        | Reserved for forthcoming file-driven subcommands. **Audit candidate.** |
-| `walkdir`     | Reserved for forthcoming directory-driven subcommands. **Audit candidate.** |
-| `rhai`        | Embedded scripting, reserved for forthcoming rule-based filtering. **Audit candidate** — heaviest dependency by far; demand a concrete user story before keeping. |
-| `strsim`      | String similarity for "did you mean…" hints on parse errors. **Audit candidate.** |
 
 ### Build / test only
 
-None at present. Test helpers live in-crate (`src/testing.rs`).
+| Crate         | Why it's here                                                       |
+| ------------- | ------------------------------------------------------------------- |
+| `assertables` | Process-aware assertion macros used in `#[cfg(test)]` blocks. Imported via `extern crate` from `main.rs` so the macros are available crate-wide for test discovery. (Listed as a runtime dependency in `Cargo.toml` because the `extern crate` is not gated, but its only use is in `#[cfg(test)]` blocks.) |
+
+Other test helpers live in-crate (`src/testing.rs`); they are not crates.
+
+### Previously included, now removed
+
+The crates below were added speculatively for features that have not
+materialised. They were removed in the NFR-7 audit (commit landing this
+file). Re-add only with a concrete user story in the same PR:
+
+| Crate        | Removed because                                                      |
+| ------------ | -------------------------------------------------------------------- |
+| `regex`      | No in-source reference. Reach for `.split_whitespace()` or the upstream `nhs-number` parser first. |
+| `glob`       | No in-source reference; the binary reads `stdin`, not files.         |
+| `walkdir`    | No in-source reference; the binary reads `stdin`, not directories.   |
+| `strsim`     | No in-source reference; "did you mean…" hints are not yet a feature. |
+| `rhai`       | No in-source reference; embedded scripting added the heaviest transitive closure of any candidate. |
+| `serde_yaml` | No in-source reference; no subcommand emits YAML.                    |
+| `toml`       | No in-source reference; `confy` handles TOML load/save on its own.   |
 
 ## Audit candidates
 
