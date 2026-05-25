@@ -29,6 +29,9 @@ directory contains:
    invalid inputs.
 10. [10-parse-errors](./10-parse-errors/) — examples of lines that fail
     to parse (versus fail validation).
+11. [11-flag-demo](./11-flag-demo/) — exercises every public CLI flag
+    (`--version`, `--help`, `--line-validation`, `--test`, `--verbose`)
+    and the `RUST_LOG` environment variable.
 
 ## Running an example
 
