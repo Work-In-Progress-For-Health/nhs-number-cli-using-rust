@@ -706,10 +706,6 @@ the time of writing. Each is tracked toward closure in § 15.
   `cargo clippy -- -D warnings`, `cargo test`, and
   `./examples/run-all.sh` on Linux, macOS, and Windows. (Work item:
   WI-1.)
-* **Duplicate test-path helpers.** `src/testing.rs` and
-  `src/app/testing.rs` both define near-identical `LazyLock`
-  constants. Harmonise toward `src/testing.rs` and remove the
-  duplicate when no callers remain. (Work item: WI-2.)
 * **`Iterator::enumerate` returns `usize`, not `i32`.** The
   `line_number` field on every `Error` variant is `i32`. This works
   because no input has 2³¹ lines, but the `as i32` cast is a code
@@ -776,10 +772,7 @@ replaces what would otherwise live in a `plan.md`.
 
 1. **Continuous integration.** A green CI run on Linux, macOS, and
    Windows for every PR. → WI-1.
-2. **One test helper, not two.** Eliminate the duplicate
-   `LazyLock` path module so new contributors have one obvious
-   place to look. → WI-2.
-3. **`line_number` type cleanup.** Replace the `as i32` casts with
+2. **`line_number` type cleanup.** Replace the `as i32` casts with
    a single type alias used consistently in the `Error` enum. →
    WI-5.
 
@@ -816,7 +809,7 @@ spec entries. This section replaces what would otherwise live in a
 | ID    | Title                                                              | Status      | Touches                                       |
 | ----- | ------------------------------------------------------------------ | ----------- | --------------------------------------------- |
 | WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Planned     | new file; § 11; § 14.1                        |
-| WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Planned     | `src/app/testing.rs`; § 11; § 14.2            |
+| WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.3.x | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
 | WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Planned     | `llms.txt`, `llms.json`; § 11                 |
 | WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
 | WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Planned     | `src/subcommands/check_lines.rs`; § 11        |
@@ -854,7 +847,7 @@ none>.
 | Upstream `nhs-number` crate changes its `Display` impl or `ParseError` `Debug` output      | Low        | High     | Pinning in `Cargo.toml`; dedicated upgrade PR with byte-for-byte example diff (see § 12).   |
 | A contributor accidentally commits a real NHS Number                                       | Low        | High     | NFR-5; reviewer checklist; spell-check / regex-based CI guard (planned with WI-1).          |
 | A flag rename slips through as "non-breaking"                                              | Low        | Medium   | FR-13 names flags as public API; PR template in `AGENTS/commit-and-pr.md` calls it out.     |
-| Test path drift (renaming `target/debug/nhs-number-cli`)                                   | Low        | Medium   | Single `COMMAND_OS` constant; reviewer searches both `src/testing.rs` and `src/app/testing.rs`. |
+| Test path drift (renaming `target/debug/nhs-number-cli`)                                   | Low        | Medium   | Single `COMMAND_OS` constant in `src/testing.rs`; in-crate tests `use crate::testing::*;` and `tests/test.rs` keeps its own copy of the same expression. |
 | Dependency bloat through speculative crates                                                | Medium     | Low      | NFR-7; pre-release audit; § 14 work items capture concrete needs before crates are added.   |
 
 ## 17. Decision log
@@ -869,6 +862,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | Default subcommand stays implicit on no-flag invocation                   | Backwards compatibility for shell users who run `cat … | nhs-number-cli`. FR-16 enshrines it. |
 | 2026-05-25 | One runnable example covers all flags (`examples/11-flag-demo/`)          | Closes NFR-10 / WI-4. A single example asserts every flag's contract on every CI run.         |
 | 2026-05-25 | One `#[test]` per (TBD) traceability cell in `tests/test.rs`              | Closes WI-6. Five FRs (2, 7, 9, 11, 12) now have crate-integration coverage on top of examples.|
+| 2026-05-25 | Single in-crate test helper at `src/testing.rs`                           | Closes WI-2. Removes duplicate-source confusion; new tests have one obvious import path.        |
 
 ---
 

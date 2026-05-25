@@ -35,16 +35,22 @@ literals).
 
 ## Test helpers
 
-Two near-identical helper modules exist:
+There is **one** in-crate test-helper module: `src/testing.rs`. It is
+`#[cfg(test)]`-gated by `mod testing;` in `src/main.rs`, and exposes
+`LazyLock` paths to the compiled binary
+(`COMMAND_OS`, `COMMAND_FILE`) and to the project's standard
+directories (`CARGO_MANIFEST_DIR`, `LOG_DIR`, `TESTS_DIR`, `TMP_DIR`,
+`TARGET_DIR`, `DEBUG_DIR`).
 
-* `src/testing.rs` — preferred. Exposed to every in-crate
-  `#[cfg(test)]` block via `use crate::testing::*;`.
-* `src/app/testing.rs` — older, app-local copy with the same
-  `LazyLock` path constants.
+**Convention:** every `#[cfg(test)] mod tests { … }` block in `src/`
+imports via `use crate::testing::*;`. Do not add a parallel
+helper module under `src/app/` or elsewhere; if you find a third copy
+appearing, delete it and route callers through `crate::testing`.
 
-**Convention:** new tests use `crate::testing::*`. Don't add a third
-copy. If you find divergence, harmonise toward `src/testing.rs` and
-remove the duplicate when no callers remain.
+`tests/test.rs` keeps its own copy of `COMMAND_OS` because it is a
+separate crate-integration binary and cannot reach `crate::testing`
+across the crate boundary. If the path expression there ever drifts,
+harmonise it to match `src/testing.rs`.
 
 ## Patterns
 

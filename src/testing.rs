@@ -1,7 +1,10 @@
+//! In-crate test helpers: `LazyLock` paths to the compiled binary
+//! and project directories. Used by every `#[cfg(test)] mod tests`
+//! block in the crate via `use crate::testing::*;`.
+
 use std::ffi::OsString;
-use assertables::*;
+use std::path::PathBuf;
 use std::sync::LazyLock;
-use std::path::{Path, PathBuf};
 
 #[allow(dead_code)]
 pub static CARGO_MANIFEST_DIR: LazyLock<PathBuf> =

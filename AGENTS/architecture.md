@@ -44,10 +44,8 @@ src/
 │   ├── config.rs               `pub(crate) struct Config` for persisted
 │   │                           settings. Owns `serde` derive + a `Default`.
 │   ├── confy.rs                Confy load/save tests for `Config`.
-│   ├── run.rs                  `run() -> Result<(), Error>`: initialise
-│   │                           config, parse args, dispatch a subcommand.
-│   └── testing.rs              Older copy of LazyLock test-path constants.
-│                               New tests prefer `crate::testing::*`.
+│   └── run.rs                  `run() -> Result<(), Error>`: initialise
+│                               config, parse args, dispatch a subcommand.
 ├── subcommands/
 │   ├── mod.rs                  Re-declare each subcommand module.
 │   └── check_lines.rs          The default subcommand. Reads stdin,
