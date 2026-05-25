@@ -740,17 +740,17 @@ the time of writing. Each is tracked toward closure in § 15.
 | Requirement | Code                                            | Tests                                     | Examples                              | Docs                                                          |
 | ----------- | ----------------------------------------------- | ----------------------------------------- | ------------------------------------- | ------------------------------------------------------------- |
 | FR-1        | `src/subcommands/check_lines.rs`                | `tests/test.rs`                           | `examples/01-basic/`                  | `docs/usage/index.md`                                         |
-| FR-2        | `check_lines.rs` (blank-line guard)             | (TBD)                                     | `examples/04-blank-lines/`            | `docs/usage/index.md`                                         |
+| FR-2        | `check_lines.rs` (blank-line guard)             | `tests/test.rs::fr_2_blank_lines_skipped` | `examples/04-blank-lines/`            | `docs/usage/index.md`                                         |
 | FR-3        | `check_lines.rs` (`NHSNumber::from_str`)        | `tests/test.rs`                           | `examples/03-mixed-formats/`          | `docs/about-nhs-numbers/index.md`                             |
 | FR-4        | `check_lines.rs` (`validate_check_digit`)       | `tests/test.rs`                           | `examples/01-basic/`                  | `docs/about-nhs-numbers/index.md`                             |
 | FR-5        | `check_lines.rs` (`println!`)                   | `tests/test.rs`                           | `examples/02-valid-only/`             | `docs/usage/index.md`                                         |
 | FR-6        | `check_lines.rs` (`Error::CheckDigit`)          | `tests/test.rs`                           | `examples/01-basic/`                  | `docs/troubleshooting/index.md`                               |
-| FR-7        | `check_lines.rs` (`Error::Parse`)               | (TBD)                                     | `examples/10-parse-errors/`           | `docs/troubleshooting/index.md`                               |
+| FR-7        | `check_lines.rs` (`Error::Parse`)               | `tests/test.rs::fr_7_parse_failure_to_stderr` | `examples/10-parse-errors/`           | `docs/troubleshooting/index.md`                               |
 | FR-8        | `check_lines.rs` (loop continues)               | `tests/test.rs`                           | `examples/01-basic/`                  | `docs/usage/index.md`                                         |
-| FR-9        | `check_lines.rs` (`Error::Io`)                  | (TBD)                                     | (TBD)                                 | `docs/troubleshooting/index.md`                               |
+| FR-9        | `check_lines.rs` (`Error::Io`)                  | `tests/test.rs::fr_9_read_error_to_stderr` (invalid UTF-8 input) | n/a (read errors are not user-input-driven) | `docs/troubleshooting/index.md`                               |
 | FR-10       | `check_lines.rs` (`#[error("…")]`)              | `tests/test.rs`                           | `examples/01-basic/expected-stderr.txt` | `AGENTS/behavioural-contract.md`                            |
-| FR-11       | (stdlib I/O)                                    | (TBD)                                     | `examples/05-separate-streams/`       | `docs/usage/index.md`                                         |
-| FR-12       | `src/main.rs`                                   | (TBD)                                     | `examples/07-fail-on-invalid/`        | `docs/usage/index.md`                                         |
+| FR-11       | (stdlib I/O)                                    | `tests/test.rs::fr_11_stream_separation`  | `examples/05-separate-streams/`       | `docs/usage/index.md`                                         |
+| FR-12       | `src/main.rs`                                   | `tests/test.rs::fr_12_exit_zero_on_per_line_failures` | `examples/07-fail-on-invalid/`        | `docs/usage/index.md`                                         |
 | FR-13       | `src/app/clap.rs`, `src/app/args.rs`            | `src/app/clap.rs` `#[cfg(test)]`          | `examples/11-flag-demo/`              | `docs/usage/index.md` § Flags                                 |
 | FR-14       | `src/app/config.rs`, `src/app/confy.rs`         | `src/app/confy.rs` `#[cfg(test)]`         | (n/a — config wiring not yet observable per input line) | `docs/usage/index.md` § Configuration                         |
 | FR-15       | `src/main.rs` (`env_logger::init`)              | `examples/11-flag-demo/run.sh` (RUST_LOG=trace asserts log lines + diagnostic) | `examples/11-flag-demo/`              | `docs/usage/index.md` § Logging, `AGENTS/coding-style.md`     |
@@ -779,12 +779,7 @@ replaces what would otherwise live in a `plan.md`.
 2. **One test helper, not two.** Eliminate the duplicate
    `LazyLock` path module so new contributors have one obvious
    place to look. → WI-2.
-3. **Per-line failure-mode coverage.** Crate-integration tests for
-   FR-2 (blank lines), FR-7 (parse failure), FR-9 (read error),
-   FR-11 (stream separation), and FR-12 (exit code on bad input).
-   Closes the "(TBD)" cells in the § 13 traceability matrix. →
-   WI-6.
-4. **`line_number` type cleanup.** Replace the `as i32` casts with
+3. **`line_number` type cleanup.** Replace the `as i32` casts with
    a single type alias used consistently in the `Error` enum. →
    WI-5.
 
@@ -825,7 +820,7 @@ spec entries. This section replaces what would otherwise live in a
 | WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Planned     | `llms.txt`, `llms.json`; § 11                 |
 | WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
 | WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Planned     | `src/subcommands/check_lines.rs`; § 11        |
-| WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Planned     | `tests/`; § 13; § 14.3                        |
+| WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.3.x via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
 | WI-7  | New FR + impl: `--counts` subcommand                               | Speculative | new spec entry; `src/subcommands/`; § 14.5    |
 | WI-8  | New FR + impl: `--column N` CSV-field selector                     | Speculative | new spec entry; `src/app/clap.rs`; § 14.6     |
 | WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Speculative | new spec entry; `src/subcommands/`; § 14.7    |
@@ -873,6 +868,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | Fold `plan.md` and `tasks.md` content into this file (§§ 14, 15)          | One source of truth; spec, roadmap, and work items now move together in a single PR.          |
 | 2026-05-25 | Default subcommand stays implicit on no-flag invocation                   | Backwards compatibility for shell users who run `cat … | nhs-number-cli`. FR-16 enshrines it. |
 | 2026-05-25 | One runnable example covers all flags (`examples/11-flag-demo/`)          | Closes NFR-10 / WI-4. A single example asserts every flag's contract on every CI run.         |
+| 2026-05-25 | One `#[test]` per (TBD) traceability cell in `tests/test.rs`              | Closes WI-6. Five FRs (2, 7, 9, 11, 12) now have crate-integration coverage on top of examples.|
 
 ---
 
