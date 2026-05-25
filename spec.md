@@ -654,7 +654,7 @@ See [`docs/about-nhs-numbers/index.md`](./docs/about-nhs-numbers/index.md).
 | --------------- | ------------------------------------------------- | --------------------------------------- |
 | Prefix          | literal `Error `                                  | Every diagnostic line.                  |
 | Kind            | `CheckDigit` \| `Parse` \| `Io`                   | `Error` enum variant in `check_lines`.  |
-| `line_number`   | i32 (zero-based)                                  | `Iterator::enumerate` over stdin.       |
+| `line_number`   | `LineIndex` (= `usize`, zero-based)               | `Iterator::enumerate` over stdin.       |
 | Payload         | NHS Number \| line text \| `io::Error`            | Depends on Kind.                        |
 
 ## 10. Test specifications
@@ -706,10 +706,6 @@ the time of writing. Each is tracked toward closure in § 15.
   `cargo clippy -- -D warnings`, `cargo test`, and
   `./examples/run-all.sh` on Linux, macOS, and Windows. (Work item:
   WI-1.)
-* **`Iterator::enumerate` returns `usize`, not `i32`.** The
-  `line_number` field on every `Error` variant is `i32`. This works
-  because no input has 2³¹ lines, but the `as i32` cast is a code
-  smell. (Work item: WI-5.)
 
 ## 12. Change management
 
@@ -772,9 +768,6 @@ replaces what would otherwise live in a `plan.md`.
 
 1. **Continuous integration.** A green CI run on Linux, macOS, and
    Windows for every PR. → WI-1.
-2. **`line_number` type cleanup.** Replace the `as i32` casts with
-   a single type alias used consistently in the `Error` enum. →
-   WI-5.
 
 ### Medium term (v0.5.x – v0.9.x)
 
@@ -812,7 +805,7 @@ spec entries. This section replaces what would otherwise live in a
 | WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.3.x | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
 | WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Planned     | `llms.txt`, `llms.json`; § 11                 |
 | WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
-| WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Planned     | `src/subcommands/check_lines.rs`; § 11        |
+| WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Done in v0.3.x | `src/subcommands/check_lines.rs`             |
 | WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.3.x via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
 | WI-7  | New FR + impl: `--counts` subcommand                               | Speculative | new spec entry; `src/subcommands/`; § 14.5    |
 | WI-8  | New FR + impl: `--column N` CSV-field selector                     | Speculative | new spec entry; `src/app/clap.rs`; § 14.6     |
@@ -863,6 +856,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | One runnable example covers all flags (`examples/11-flag-demo/`)          | Closes NFR-10 / WI-4. A single example asserts every flag's contract on every CI run.         |
 | 2026-05-25 | One `#[test]` per (TBD) traceability cell in `tests/test.rs`              | Closes WI-6. Five FRs (2, 7, 9, 11, 12) now have crate-integration coverage on top of examples.|
 | 2026-05-25 | Single in-crate test helper at `src/testing.rs`                           | Closes WI-2. Removes duplicate-source confusion; new tests have one obvious import path.        |
+| 2026-05-25 | `pub type LineIndex = usize;` for `Error::*::line_number`                 | Closes WI-5. Matches `Iterator::enumerate`; drops the `as i32` cast; user-visible output is byte-identical (non-negative integers render the same).|
 
 ---
 
