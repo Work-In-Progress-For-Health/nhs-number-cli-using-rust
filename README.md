@@ -1,8 +1,7 @@
 # NHS Number command line interface
 
-A National Health Service (NHS) Number is a unique number allocated in a shared
-numbering scheme to registered users of the three public health services in
-England, Wales, and the Isle of Man.
+A National Health Service (NHS) Number is a unique ten-digit identifier
+allocated to registered patients of NHS England and the NHS Isle of Man.
 
 This tool is a command line interface that parses each standard input line into
 an NHS number, then validates the check digit is correct.

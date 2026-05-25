@@ -1,8 +1,8 @@
 # About NHS Numbers
 
 An **NHS Number** is a unique identifier allocated to every person
-registered with the public health services of England, Wales, and the Isle
-of Man. Scotland uses a different identifier (the CHI number), and
+registered with the public health services of NHS England and the NHS
+Isle of Man. Scotland uses a different identifier (the CHI number), and
 Northern Ireland uses the H&C number.
 
 ## Shape

@@ -38,8 +38,8 @@ that every future maintainer has to respect, so the bar is high.
 
 ## Where can I report bugs or request features?
 
-<https://github.com/GIG-Cymru-NHS-Wales/nhs-number-cli-using-rust/issues>.
+<https://github.com/joelparkerhenderson/nhs-number-cli/issues>.
 
 ## Who do I contact for anything else?
 
-Joel Henderson, <joel.henderson@wales.nhs.uk>.
+Joel Parker Henderson, <joel@joelparkerhenderson.com>.

@@ -4,9 +4,7 @@
 //! We have these args in their own file in order to be flexible,
 //! such as being able to start our app with other arg parsers.
 
-use crate::types::{list::*, map::*};
-
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Args {
 
     /// Test flag that sets whether the app prints diagnostics.
@@ -19,12 +17,4 @@ pub struct Args {
 
     /// Line validation subcommand: true=run, false=skip
     pub(crate) check_lines: Option<bool>,
-}
-
-impl std::default::Default for Args {
-    fn default() -> Self { Self {
-        test: false,
-        log_level: None,
-        check_lines: None,
-    }}
 }

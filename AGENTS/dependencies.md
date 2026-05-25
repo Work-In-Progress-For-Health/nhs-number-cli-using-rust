@@ -1,8 +1,10 @@
 # Dependencies
 
-Each entry in `Cargo.toml` should have a clear reason to exist. This file
-records that reason, the surface area we actually use, and the alternatives
-we considered. Add to it whenever you add, upgrade, or remove a crate.
+Each entry in `Cargo.toml` should have a clear reason to exist. This
+file records that reason, the surface area we actually use, and the
+alternatives we considered. Add to it whenever you add, upgrade, or
+remove a crate. The cross-cutting requirement is
+[`../spec.md`](../spec.md) § NFR-7.
 
 ## Licence policy
 
@@ -12,9 +14,9 @@ The crate is multi-licensed:
 MIT OR Apache-2.0 OR GPL-2.0 OR GPL-3.0 OR BSD-3-Clause
 ```
 
-Any new dependency must be **compatible with the intersection** of these
-licences. In practice this means `MIT OR Apache-2.0` is always safe; pure
-GPL-only dependencies are not acceptable.
+Any new dependency must be **compatible with the intersection** of
+these licences. In practice this means `MIT OR Apache-2.0` is always
+safe; pure GPL-only dependencies are not acceptable.
 
 Run a licence check before adding a dependency:
 
@@ -22,6 +24,8 @@ Run a licence check before adding a dependency:
 cargo install cargo-license   # one-time
 cargo license
 ```
+
+See `../spec.md` § NFR-6.
 
 ## Current dependencies
 
@@ -43,13 +47,14 @@ cargo license
 | ------------- | ------------------------------------------------------------------- |
 | `assertables` | Process-aware assertion macros used in `#[cfg(test)]` blocks. Imported via `extern crate` from `main.rs` so the macros are available crate-wide for test discovery. (Listed as a runtime dependency in `Cargo.toml` because the `extern crate` is not gated, but its only use is in `#[cfg(test)]` blocks.) |
 
-Other test helpers live in-crate (`src/testing.rs`); they are not crates.
+Other test helpers live in-crate (`src/testing.rs`); they are not
+crates.
 
 ### Previously included, now removed
 
 The crates below were added speculatively for features that have not
-materialised. They were removed in the NFR-7 audit (commit landing this
-file). Re-add only with a concrete user story in the same PR:
+materialised. They were removed in the v0.3.0 NFR-7 audit. Re-add
+only with a concrete user story in the same PR:
 
 | Crate        | Removed because                                                      |
 | ------------ | -------------------------------------------------------------------- |
@@ -63,16 +68,15 @@ file). Re-add only with a concrete user story in the same PR:
 
 ## Audit candidates
 
-A few crates were added in anticipation of features that may or may not
-ship. Before each release:
+Before each release:
 
 1. Run `cargo +nightly udeps` (or `cargo machete`) to find unused
    dependencies.
-2. For each crate marked **Audit candidate** above, check whether any
-   subcommand has started using it.
-3. If a crate is still unused and no concrete user story exists for the
-   feature it was reserved for, remove it. Smaller dependency closure =
-   faster build, smaller binary, smaller attack surface.
+2. For each currently-included crate, check whether any subcommand
+   still uses it.
+3. If a crate is unused and no concrete user story exists for the
+   feature it was reserved for, remove it. Smaller dependency closure
+   = faster build, smaller binary, smaller attack surface.
 
 ## Adding a dependency
 
@@ -83,30 +87,31 @@ ship. Before each release:
    twelve months and an issue response within the last six.
 4. Pin to a minor version (`^X.Y`), not a major (`*` or `X`).
 5. Enable only the features you need. `default-features = false` plus
-   explicit `features = ["…"]` is preferred when defaults pull in extras.
+   explicit `features = ["…"]` is preferred when defaults pull in
+   extras.
 6. Document the entry in this file in the same commit.
 
 ## Upgrading a dependency
 
-* Patch upgrades (`X.Y.Z → X.Y.Z+1`) are non-breaking by SemVer; review
-  the changelog anyway.
+* Patch upgrades (`X.Y.Z → X.Y.Z+1`) are non-breaking by SemVer;
+  review the changelog anyway.
 * Minor upgrades (`X.Y.Z → X.Y+1.0`): review the changelog for new
-  features and any subtle behaviour changes. Run the full test suite and
-  all examples.
+  features and any subtle behaviour changes. Run the full test suite
+  and all examples.
 * Major upgrades: open a PR titled `Upgrade <crate> to vX`. Run all
   examples; expect to update fixtures.
 
 The `Cargo.lock` file is committed (this is a binary crate, not a
-library). Upgrades go via `cargo update -p <crate>` so other crates stay
-pinned.
+library). Upgrades go via `cargo update -p <crate>` so other crates
+stay pinned.
 
 ## Pinning `nhs-number`
 
-The domain crate is the only dependency whose behaviour can change the
-*output bytes* of this binary. Pin it to a known-good version and bump
-deliberately. A change in `nhs-number`'s `Display` impl or
+The domain crate is the only dependency whose behaviour can change
+the *output bytes* of this binary. Pin it to a known-good version and
+bump deliberately. A change in `nhs-number`'s `Display` impl or
 `ParseError` `Debug` output is, by virtue of the
-[behavioural contract](./behavioural-contract.md), a breaking change for
-this binary.
+[behavioural contract](./behavioural-contract.md), a breaking change
+for this binary.
 
 <!-- cSpell:ignore assertables confy crates serde thiserror udeps walkdir Rhai strsim -->

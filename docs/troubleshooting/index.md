@@ -79,7 +79,7 @@ Edition 2024 requires Rust 1.85 or newer.
 ## Reporting a bug
 
 Open an issue at
-<https://github.com/GIG-Cymru-NHS-Wales/nhs-number-cli-using-rust/issues>
+<https://github.com/joelparkerhenderson/nhs-number-cli/issues>
 and include:
 
 * The command you ran.

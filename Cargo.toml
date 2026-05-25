@@ -2,12 +2,12 @@
 name = "nhs-number-cli"
 version = "0.3.0"
 edition = "2024"
-authors = ["Joel Parker Henderson <joel.henderson@wales.nhs.uk>"]
-description = "National Health Service (NHS) number for NHS England, NHS Wales, NHS Isle of Man."
+authors = ["Joel Parker Henderson <joel@joelparkerhenderson.com>"]
+description = "Command line tool that validates United Kingdom (UK) National Health Service (NHS) Numbers, one per line, from standard input."
 license = "MIT OR Apache-2.0 OR GPL-2.0 OR GPL-3.0 OR BSD-3-Clause"
-repository = "https://github.com/GIG-Cymru-NHS-Wales/nhs-number-cli-using-rust/"
+repository = "https://github.com/joelparkerhenderson/nhs-number-cli/"
 readme = "README.md"
-keywords = ["health", "iechyd", "nhs"]
+keywords = ["health", "medical", "identifier", "cli"]
 categories = ["science", "data-structures", "value-formatting"]
 include = ["src/**/*", "LICENSE.md", "README.md"]
 

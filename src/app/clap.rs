@@ -18,8 +18,6 @@
 
 use clap::{Arg, Command};
 use crate::app::args::Args;
-use crate::types::{list::*, map::*};
-use std::path::PathBuf;
 
 /// Create a clap app.
 pub fn app() -> Command {

@@ -15,7 +15,15 @@
       "Bash(chmod +x /Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/run-all.sh)",
       "Bash(/Users/jph/git/gig-cymru-nhs-wales/nhs-number-cli/examples/run-all.sh)",
       "Bash(cargo test *)",
-      "Bash(./examples/run-all.sh)"
+      "Bash(./examples/run-all.sh)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(cargo clippy *)",
+      "Bash(./target/debug/nhs-number-cli --line-validation)",
+      "Bash(command -v cargo-machete)",
+      "Bash(cargo machete *)",
+      "Read(//tmp/**)",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }

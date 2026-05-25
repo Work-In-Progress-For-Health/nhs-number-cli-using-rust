@@ -13,8 +13,8 @@ rustc --version
 ## Clone
 
 ```sh
-git clone https://github.com/GIG-Cymru-NHS-Wales/nhs-number-cli-using-rust.git
-cd nhs-number-cli-using-rust
+git clone https://github.com/joelparkerhenderson/nhs-number-cli.git
+cd nhs-number-cli
 ```
 
 ## Build

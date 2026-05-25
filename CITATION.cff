@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: Selenium examples using JavaScript
+title: nhs-number-cli
 message: >-
   If you use this work and you want to cite it,
   then you can use the metadata from this file.
@@ -7,14 +7,14 @@ type: software
 authors:
   - given-names: Joel Parker
     family-names: Henderson
-    email: joel.henderson@wales.nhs.uk
-    affiliation: wales.nhs.uk
+    email: joel@joelparkerhenderson.com
     orcid: 'https://orcid.org/0009-0000-4681-282X'
 identifiers:
   - type: url
-    value: 'https://github.com/gig-cymru-nhs-wales/selenium-examples-using-javascript/'
-    description: Selenium examples using JavaScript
-repository-code: 'https://github.com/gig-cymru-nhs-wales/selenium-examples-using-javascript/'
+    value: 'https://github.com/joelparkerhenderson/nhs-number-cli/'
+    description: nhs-number-cli — NHS Number validator command line tool
+repository-code: 'https://github.com/joelparkerhenderson/nhs-number-cli/'
 abstract: >-
-  Selenium examples using JavaScript
-license: See license file
+  A Unix-filter command line tool that validates National Health Service
+  (NHS) Numbers, one per line, from standard input.
+license: MIT OR Apache-2.0 OR GPL-2.0 OR GPL-3.0 OR BSD-3-Clause

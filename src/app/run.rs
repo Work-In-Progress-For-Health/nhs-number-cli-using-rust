@@ -1,9 +1,7 @@
 //! Run the app
 
-use std::path::PathBuf;
 use crate::app::args::Args;
 use crate::app::config::Config;
-use crate::types::list::*;
 
 /// Run everything.
 ///
@@ -63,13 +61,7 @@ fn initialize_arguments() -> Args {
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-
-    #[error("ParseError ➡ {string:?}")]
-    ParseError {
-        string: String
-    },
-
-    #[error("Confy ➡ {0:?}")]
+    #[error("Error loading configuration. Error: {0:?}")]
     Confy(::confy::ConfyError),
 }
 
@@ -84,4 +76,4 @@ mod tests {
 
 }
 
-// cSpell:ignore walkdir
+// cSpell:ignore confy
