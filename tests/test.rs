@@ -21,7 +21,7 @@ fn test() {
         .stderr(Stdio::piped())
         .spawn()
         .unwrap();
-    let select = "999 123 4560";
+    let select = "999 999 9999";
     let reject = "999 123 4561";
     let input = format!("{}\n{}\n", select, reject);
     if let Some(mut stdin) = command.stdin.take() {
