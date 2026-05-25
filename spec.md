@@ -810,7 +810,7 @@ spec entries. This section replaces what would otherwise live in a
 | WI-7  | New FR + impl: `--counts` subcommand                               | Speculative | new spec entry; `src/subcommands/`; § 14.5    |
 | WI-8  | New FR + impl: `--column N` CSV-field selector                     | Speculative | new spec entry; `src/app/clap.rs`; § 14.6     |
 | WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Speculative | new spec entry; `src/subcommands/`; § 14.7    |
-| WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Planned     | `src/app/.DS_Store`; `.gitignore`             |
+| WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Done in v0.3.x | `.gitignore` (`.DS_Store`, `*.swp`, `*~`)   |
 
 ### Work item template
 
@@ -857,6 +857,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | One `#[test]` per (TBD) traceability cell in `tests/test.rs`              | Closes WI-6. Five FRs (2, 7, 9, 11, 12) now have crate-integration coverage on top of examples.|
 | 2026-05-25 | Single in-crate test helper at `src/testing.rs`                           | Closes WI-2. Removes duplicate-source confusion; new tests have one obvious import path.        |
 | 2026-05-25 | `pub type LineIndex = usize;` for `Error::*::line_number`                 | Closes WI-5. Matches `Iterator::enumerate`; drops the `as i32` cast; user-visible output is byte-identical (non-negative integers render the same).|
+| 2026-05-25 | `.gitignore` excludes `.DS_Store`, `*.swp`, `*~`                          | Closes WI-10. Prevents future macOS/Vim/Emacs cruft from sneaking in via `git add .`. The previously-tracked `src/app/.DS_Store` was already gone from the tree. |
 
 ---
 

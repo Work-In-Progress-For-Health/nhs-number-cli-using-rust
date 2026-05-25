@@ -65,9 +65,9 @@ A short, prescriptive list. If you are about to do one of these,
 
 ## Repository
 
-* **No commit of `.DS_Store`** or other OS cruft. There's one tracked
-  at `src/app/.DS_Store` that should be removed in a cleanup PR; do
-  not add more.
+* **No commit of `.DS_Store`** or other OS cruft. `.gitignore`
+  excludes `.DS_Store` and editor swap files, but `git add -f` would
+  still slip them in — don't.
 * **No commit of `target/`** other than the deliberately-tracked
   Windows GNU binary.
 * **No new top-level directories** without a one-line justification

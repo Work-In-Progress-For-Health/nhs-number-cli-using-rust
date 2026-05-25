@@ -2,3 +2,10 @@
 !/target/**/
 
 !/target/x86_64-pc-windows-gnu/release/nhs-number-cli.exe
+
+# macOS finder metadata.
+.DS_Store
+
+# Vim / Emacs swap files.
+*.swp
+*~
