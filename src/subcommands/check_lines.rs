@@ -49,20 +49,20 @@ pub fn check_lines() {
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
 
-    #[error("CheckDigitError ➡ line_number: {line_number:?}, nhs_number: {nhs_number}")]
+    #[error("Error invalid line {line_number}. Error: validate check digit failed. NHS Number: {nhs_number}")]
     CheckDigitError {
         line_number: i32,
         nhs_number: NHSNumber,
     },
 
-    #[error("ParseError ➡ line_number: {line_number:?}, line: {line:?}, error: {error:?}")]
+    #[error("Error parsing line {line_number}. Error: {error:?}. Line: {line}")]
     ParseError {
         line_number: i32,
         line: String,
         error: nhs_number::parse_error::ParseError,
     },
 
-    #[error("IOError ➡ line_number: {line_number:?}, error: {error:?}")]
+    #[error("Error reading line {line_number}. Error: {error}")]
     IOError {
         line_number: i32,
         error: std::io::Error,

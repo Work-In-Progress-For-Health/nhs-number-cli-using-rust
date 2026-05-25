@@ -25,7 +25,7 @@ Suppose you have a text file `input.txt` that contains one NNS Number per line,
 and some may be valid or invalid:
 
 ```txt
-999 123 4560
+999 999 9999
 999 123 4561
 ```
 
@@ -44,7 +44,7 @@ type input.txt | nhs-number-cli.exe
 The commmand prints the valid NHS Number to stdout:
 
 ```stdout
-999 123 4560
+999 999 9999
 ```
 
 The commmand prints the invalid NHS Number to stderr:

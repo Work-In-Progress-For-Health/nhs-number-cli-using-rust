@@ -13,7 +13,7 @@ An NHS Number is **ten digits**, conventionally written as three groups:
 NNN NNN NNNN
 ```
 
-For example: `999 123 4560`.
+For example: `999 999 9999`.
 
 The digits are often stored without spaces in databases. `nhs-number-cli`
 accepts both styles — any whitespace between digits is tolerated by the

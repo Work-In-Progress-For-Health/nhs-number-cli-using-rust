@@ -38,8 +38,8 @@ their own flag; the no-flag default behaviour will not change. See
 ## Input
 
 * One NHS Number per line.
-* Whitespace between digits is tolerated. Both `9991234560` and
-  `999 123 4560` parse successfully.
+* Whitespace between digits is tolerated. Both `9999999999` and
+  `999 999 9999` parse successfully.
 * Blank lines are skipped.
 * Lines with other content (letters, punctuation other than spaces,
   fewer or more than ten digits) are reported as parse errors.

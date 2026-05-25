@@ -55,7 +55,7 @@ fn rejects_bad_check_digit() {
     assert_program_args_stdout_string_contains!(
         &*COMMAND_OS,
         &["--line-validation"],
-        "999 123 4560",
+        "999 999 9999",
     );
 }
 ```

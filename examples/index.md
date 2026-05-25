@@ -71,13 +71,11 @@ Valid test numbers used in these examples (all have correct Modulus 11
 check digits):
 
 ```
-999 000 0000
 999 000 0018
 999 000 0026
 999 000 0034
 999 000 0042
 999 000 0069
-999 123 4560
 999 555 0016
 999 555 0024
 999 888 1005
@@ -88,11 +86,21 @@ check digits):
 Intentionally invalid numbers used for error cases:
 
 ```
+999 000 0000    # Modulus 11 result is 10 → no valid check digit for this prefix
+999 123 4560    # Modulus 11 result is 10 → no valid check digit for this prefix
 999 123 4561    # correct shape, wrong check digit
 999 000 0001    # correct shape, wrong check digit
 not-an-nhs-no   # unparseable
 1234            # too short
 ```
+
+**Note.** `999 000 0000` and `999 123 4560` were previously listed as
+"valid" in this file and in some other docs. They are not: the Modulus
+11 algorithm yields a result of 10 for both prefixes, which by the NHS
+specification means no valid NHS Number exists with those nine leading
+digits. The `nhs-number` crate accepted them in 1.0.0 but correctly
+rejects them from 1.0.1 onward. Use any other number from the valid
+list above.
 
 **Never** put a real NHS Number into a test fixture, bug report, commit
 message, or example. Patient identifiers are personal data under the

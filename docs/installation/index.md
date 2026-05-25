@@ -61,10 +61,10 @@ can drop it into a folder listed in `%PATH%`.
 ### Verify the installation
 
 ```sh
-echo "999 123 4560" | nhs-number-cli
+echo "999 999 9999" | nhs-number-cli
 ```
 
-You should see `999 123 4560` echoed back on standard output.
+You should see `999 999 9999` echoed back on standard output.
 
 ## Uninstall
 

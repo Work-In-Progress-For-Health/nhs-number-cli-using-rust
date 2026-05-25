@@ -20,7 +20,7 @@ and some may be valid or invalid:
 //!
 
 ```txt
-999 123 4560
+999 999 9999
 999 123 4561
 ```
 
@@ -33,7 +33,7 @@ cat input.txt | nhs-number-cli --line-validation
 The output is one stdout line and one stderr line: 
 
 ```stdout
-999 123 4560
+999 999 9999
 ```
 
 ```stderr

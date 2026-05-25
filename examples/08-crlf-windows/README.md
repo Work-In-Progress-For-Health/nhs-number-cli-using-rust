@@ -9,7 +9,7 @@ systems:
    required.
 2. **Trailing whitespace** on a line (spaces, tabs). These are *not*
    stripped, and the parser will reject a number such as
-   `"999 000 0000 "` (trailing space). Normalise with `sed` or `awk`
+   `"999 000 0069 "` (trailing space). Normalise with `sed` or `awk`
    before piping.
 
 This example exercises both cases.

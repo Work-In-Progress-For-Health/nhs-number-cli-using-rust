@@ -6,11 +6,11 @@ Cookbook-style recipes. Longer, runnable examples live under
 ## Validate a single number
 
 ```sh
-echo "999 123 4560" | nhs-number-cli
+echo "999 999 9999" | nhs-number-cli
 ```
 
 ```
-999 123 4560
+999 999 9999
 ```
 
 ## Validate a list of numbers
@@ -18,12 +18,12 @@ echo "999 123 4560" | nhs-number-cli
 `input.txt`:
 
 ```
-999 123 4560
-9991234560
+999 999 9999
+9999999999
 999 123 4561
 not-an-nhs-number
 
-999 000 0011
+999 000 0018
 ```
 
 Run:
@@ -35,9 +35,9 @@ cat input.txt | nhs-number-cli
 Expected `stdout`:
 
 ```
-999 123 4560
-999 123 4560
-999 000 0011
+999 999 9999
+999 999 9999
+999 000 0018
 ```
 
 Expected `stderr`:
