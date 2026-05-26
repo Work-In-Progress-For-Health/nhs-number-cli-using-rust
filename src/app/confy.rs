@@ -14,5 +14,4 @@ mod tests {
         let config: Config = ::confy::load(env!("CARGO_PKG_NAME"), None).unwrap();
         dbg!(config);
     }
-
 }

@@ -8,7 +8,8 @@
 /// let my_queue: Queue<i32> = Queue::new();
 /// ```
 ///
-#[allow(dead_code)] pub type Queue<T> = std::collections::VecDeque<T>;
+#[allow(dead_code)]
+pub type Queue<T> = std::collections::VecDeque<T>;
 
 /// Create a typical queue collection with elements.
 ///
@@ -45,10 +46,7 @@ mod tests {
 
     #[test]
     fn test_queue_macro_with_multiline() {
-        let x = queue!(
-            1,
-            2
-        );
+        let x = queue!(1, 2);
         assert!(x.contains(&1));
     }
 
@@ -58,5 +56,4 @@ mod tests {
     //     let x: queue!();
     //     assert_eq!(x.is_empty());
     // }
-
 }

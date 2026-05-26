@@ -8,7 +8,8 @@
 /// let my_set: Set<i32> = Set::new();
 /// ```
 ///
-#[allow(dead_code)] pub type Set<T> = std::collections::BTreeSet<T>;
+#[allow(dead_code)]
+pub type Set<T> = std::collections::BTreeSet<T>;
 
 /// Create a typical set collection with elements.
 ///
@@ -46,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_set_macro_multiline() {
-        let x = set!{
+        let x = set! {
             1,
             2
         };
@@ -59,5 +60,4 @@ mod tests {
     //     let x: set!();
     //     assert_eq!(x.is_empty());
     // }
-
 }

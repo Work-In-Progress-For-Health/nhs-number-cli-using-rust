@@ -8,7 +8,8 @@
 /// let my_list: List<i32> = List::new();
 /// ```
 ///
-#[allow(dead_code)] pub type List<T> = std::vec::Vec<T>;
+#[allow(dead_code)]
+pub type List<T> = std::vec::Vec<T>;
 
 /// Create a typical list collection with elements.
 ///
@@ -45,10 +46,7 @@ mod tests {
 
     #[test]
     fn test_list_macro_with_multiline() {
-        let x = list!(
-            1,
-            2
-        );
+        let x = list!(1, 2);
         assert!(x.contains(&1));
     }
 
@@ -58,5 +56,4 @@ mod tests {
     //     let x: list!();
     //     assert_eq!(x.is_empty());
     // }
-
 }

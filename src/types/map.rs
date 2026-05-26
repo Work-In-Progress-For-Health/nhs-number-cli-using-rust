@@ -8,7 +8,8 @@
 /// let my_map: Map<i32, i32> = Map::new();
 /// ```
 ///
-#[allow(dead_code)] pub type Map<K,V> = std::collections::BTreeMap<K,V>;
+#[allow(dead_code)]
+pub type Map<K, V> = std::collections::BTreeMap<K, V>;
 
 /// Create a typical map collection with elements.
 ///
@@ -61,5 +62,4 @@ mod tests {
     //     let x: map!();
     //     assert_eq!(x.is_empty());
     // }
-
 }

@@ -8,7 +8,8 @@
 /// let my_stack: Stack<i32> = Stack::new();
 /// ```
 ///
-#[allow(dead_code)] pub type Stack<T> = std::vec::Vec<T>;
+#[allow(dead_code)]
+pub type Stack<T> = std::vec::Vec<T>;
 
 /// Create a typical stack collection with elements.
 ///
@@ -45,10 +46,7 @@ mod tests {
 
     #[test]
     fn test_stack_macro_with_multiline() {
-        let x = stack!(
-            1,
-            2
-        );
+        let x = stack!(1, 2);
         assert!(x.contains(&1));
     }
 
@@ -58,5 +56,4 @@ mod tests {
     //     let x: stack!();
     //     assert_eq!(x.is_empty());
     // }
-
 }

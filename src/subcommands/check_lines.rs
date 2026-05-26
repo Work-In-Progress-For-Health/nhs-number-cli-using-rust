@@ -1,5 +1,5 @@
-use std::io::{self, BufRead};
 use nhs_number::NHSNumber;
+use std::io::{self, BufRead};
 use std::str::FromStr;
 
 /// Zero-based index of a line of input as it is read from `stdin`.
@@ -22,26 +22,35 @@ pub fn check_lines() {
                         if nhs_number.validate_check_digit() {
                             println!("{}", nhs_number);
                         } else {
-                            eprintln!("{}", Error::CheckDigit {
-                                line_number: i,
-                                nhs_number,
-                            });
+                            eprintln!(
+                                "{}",
+                                Error::CheckDigit {
+                                    line_number: i,
+                                    nhs_number,
+                                }
+                            );
                         }
-                    },
+                    }
                     Err(e) => {
-                        eprintln!("{}", Error::Parse {
-                            line_number: i,
-                            line: line.clone(),
-                            error: e,
-                        });
+                        eprintln!(
+                            "{}",
+                            Error::Parse {
+                                line_number: i,
+                                line: line.clone(),
+                                error: e,
+                            }
+                        );
                     }
                 }
             }
             Err(e) => {
-                eprintln!("{}", Error::Io {
-                    line_number: i,
-                    error: e,
-                });
+                eprintln!(
+                    "{}",
+                    Error::Io {
+                        line_number: i,
+                        error: e,
+                    }
+                );
             }
         }
     }
@@ -49,7 +58,9 @@ pub fn check_lines() {
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("Error invalid line {line_number}. Error: validate check digit failed. NHS Number: {nhs_number}")]
+    #[error(
+        "Error invalid line {line_number}. Error: validate check digit failed. NHS Number: {nhs_number}"
+    )]
     CheckDigit {
         line_number: LineIndex,
         nhs_number: NHSNumber,

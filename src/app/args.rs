@@ -6,7 +6,6 @@
 
 #[derive(Debug, Default)]
 pub struct Args {
-
     /// Test flag that sets whether the app prints diagnostics.
     /// Example: true means print diagnostics.
     pub(crate) test: bool,

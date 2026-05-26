@@ -52,9 +52,9 @@ fn initialize_configuration() -> Result<Config, Error> {
 fn initialize_arguments() -> Args {
     trace!("initialize_arguments");
     let args: Args = crate::app::clap::args();
-    if args.test { 
+    if args.test {
         println!("{:?}", args);
-        println!("log level: {:?}", args.log_level); 
+        println!("log level: {:?}", args.log_level);
     }
     args
 }
@@ -73,7 +73,6 @@ mod tests {
     fn test_run() {
         //TODO
     }
-
 }
 
 // cSpell:ignore confy

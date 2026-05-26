@@ -16,8 +16,8 @@
 //! We favor our convention of doing clap setup in a file named `clap.rs`,
 //! rather than in `main.rs`, because we like the separation of concerns.
 
-use clap::{Arg, Command};
 use crate::app::args::Args;
+use clap::{Arg, Command};
 
 /// Create a clap app.
 pub fn app() -> Command {
@@ -64,7 +64,11 @@ pub fn args() -> Args {
     } else {
         None
     };
-    Args { test, log_level, check_lines }
+    Args {
+        test,
+        log_level,
+        check_lines,
+    }
 }
 
 #[cfg(test)]
@@ -80,9 +84,9 @@ mod tests {
     /// which includes a typical print debug of the entire `args` structure.
     ///
     /// Example:
-    /// 
+    ///
     ///     nhs-number-cli --test
-    /// 
+    ///
     #[test]
     fn test_test() {
         assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test"], r#"Args { "#);
@@ -95,22 +99,73 @@ mod tests {
     /// which can include debugging messages, warnings, errors, and so on.
     ///
     /// Example:
-    /// 
+    ///
     ///     sita --verbose
-    /// 
+    ///
     #[test]
     fn test_verbose() {
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test"], r#" log_level: None"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "-v"], r#" log_level: Some(Error)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "-vv"], r#" log_level: Some(Warn)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "-vvv"], r#" log_level: Some(Info)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "-vvvv"], r#" log_level: Some(Debug)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "-vvvvv"], r#" log_level: Some(Trace)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--verbose"], r#" log_level: Some(Error)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--verbose", "--verbose"], r#" log_level: Some(Warn)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--verbose", "--verbose", "--verbose"], r#" log_level: Some(Info)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--verbose", "--verbose", "--verbose", "--verbose"], r#" log_level: Some(Debug)"#);
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--verbose", "--verbose", "--verbose", "--verbose", "--verbose"], r#" log_level: Some(Trace)"#);
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test"],
+            r#" log_level: None"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "-v"],
+            r#" log_level: Some(Error)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "-vv"],
+            r#" log_level: Some(Warn)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "-vvv"],
+            r#" log_level: Some(Info)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "-vvvv"],
+            r#" log_level: Some(Debug)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "-vvvvv"],
+            r#" log_level: Some(Trace)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--verbose"],
+            r#" log_level: Some(Error)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--verbose", "--verbose"],
+            r#" log_level: Some(Warn)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--verbose", "--verbose", "--verbose"],
+            r#" log_level: Some(Info)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--verbose", "--verbose", "--verbose", "--verbose"],
+            r#" log_level: Some(Debug)"#
+        );
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &[
+                "--test",
+                "--verbose",
+                "--verbose",
+                "--verbose",
+                "--verbose",
+                "--verbose"
+            ],
+            r#" log_level: Some(Trace)"#
+        );
     }
 
     /// Test that the special argument `--verbose` is working.
@@ -120,12 +175,15 @@ mod tests {
     /// which can include debugging messages, warnings, errors, and so on.
     ///
     /// Example:
-    /// 
+    ///
     ///     sita --verbose
-    /// 
+    ///
     #[test]
     fn test_check_lines() {
-        assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test", "--line-validation"], r#" check_lines: Some(true)"#);
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--line-validation"],
+            r#" check_lines: Some(true)"#
+        );
     }
-
 }

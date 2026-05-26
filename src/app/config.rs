@@ -6,7 +6,7 @@
 //! We manage configuration file settings via the `confy` crate.
 //! See the project file `confy.rs` for testing our `confy` loading.
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Config {
@@ -14,7 +14,7 @@ pub(crate) struct Config {
 }
 
 impl std::default::Default for Config {
-    fn default() -> Self { Self {
-        version: 1,
-    } }
+    fn default() -> Self {
+        Self { version: 1 }
+    }
 }

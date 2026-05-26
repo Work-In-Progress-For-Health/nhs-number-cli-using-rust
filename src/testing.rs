@@ -47,16 +47,26 @@ pub static DEBUG_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
 
 #[allow(dead_code)]
 pub static COMMAND_FILE: LazyLock<PathBuf> = LazyLock::new(|| {
-    [env!("CARGO_MANIFEST_DIR"), "target", "debug", "nhs-number-cli"]
-        .iter()
-        .collect::<PathBuf>()
+    [
+        env!("CARGO_MANIFEST_DIR"),
+        "target",
+        "debug",
+        "nhs-number-cli",
+    ]
+    .iter()
+    .collect::<PathBuf>()
 });
 
 #[allow(dead_code)]
 pub static COMMAND_OS: LazyLock<OsString> = LazyLock::new(|| {
     OsString::from(
-        [env!("CARGO_MANIFEST_DIR"), "target", "debug", "nhs-number-cli"]
-            .iter()
-            .collect::<PathBuf>(),
+        [
+            env!("CARGO_MANIFEST_DIR"),
+            "target",
+            "debug",
+            "nhs-number-cli",
+        ]
+        .iter()
+        .collect::<PathBuf>(),
     )
 });

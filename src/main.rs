@@ -5,14 +5,14 @@
 //!
 //! This tool is a command line interface that parses each standard input line
 //! into an NHS Number, then validates that the check digit is correct.
-//! 
+//!
 //! References:
-//! 
+//!
 //! * [National Health Service (NHS)](https://en.wikipedia.org/wiki/National_Health_Service)
-//! 
+//!
 //! * [NHS Number](https://en.wikipedia.org/wiki/NHS_number)
-//! 
- 
+//!
+
 mod app;
 mod subcommands;
 mod types;
@@ -22,8 +22,8 @@ mod testing;
 
 #[macro_use]
 extern crate log;
-extern crate env_logger;
 extern crate assertables;
+extern crate env_logger;
 
 fn main() {
     env_logger::init();

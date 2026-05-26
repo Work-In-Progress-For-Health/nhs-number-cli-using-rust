@@ -16,9 +16,14 @@ use std::sync::LazyLock;
 #[allow(dead_code)]
 pub static COMMAND_OS: LazyLock<OsString> = LazyLock::new(|| {
     OsString::from(
-        [env!("CARGO_MANIFEST_DIR"), "target", "debug", "nhs-number-cli"]
-            .iter()
-            .collect::<PathBuf>(),
+        [
+            env!("CARGO_MANIFEST_DIR"),
+            "target",
+            "debug",
+            "nhs-number-cli",
+        ]
+        .iter()
+        .collect::<PathBuf>(),
     )
 });
 
@@ -103,7 +108,11 @@ fn fr_7_parse_failure_to_stderr() {
         run.stdout_lines(),
     );
     let stderr = run.stderr_lines();
-    assert_eq!(stderr.len(), 1, "expected exactly one diagnostic; got {stderr:?}");
+    assert_eq!(
+        stderr.len(),
+        1,
+        "expected exactly one diagnostic; got {stderr:?}"
+    );
     assert!(stderr[0].starts_with("Error parsing line 0."));
     assert!(stderr[0].contains("not-an-nhs-number"));
 }
