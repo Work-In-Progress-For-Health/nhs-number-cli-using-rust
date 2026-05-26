@@ -1,10 +1,10 @@
 # spec.md — nhs-number-cli
 
 **Status:** Living document.
-**Document version:** 0.3.
+**Document version:** 0.4.
 **Crate version tracked:** [`Cargo.toml`](./Cargo.toml) (currently
-**0.3.0**).
-**Last reviewed:** 2026-05-25.
+**0.4.0**).
+**Last reviewed:** 2026-05-26.
 
 This file is the project's single source of truth for *what* the
 binary must do and *how the work to get there is organised*. The code
@@ -582,7 +582,7 @@ and is plain text in every format.
 * `text` (default) preserves the FR-10 byte-for-byte stable
   contract on stderr, and the four key/value rows on stdout for
   `--counts`. **A green default `cargo run < input.txt` must be
-  byte-identical to its v0.3.x baseline.**
+  byte-identical to its pre-FR-19 baseline.**
 * `json` emits one JSON object per diagnostic line (NDJSON), with
   three `kind` values: `check_digit`, `parse_error`, `io_error`.
   String fields use the standard JSON escape rules (`"`, `\`,
@@ -674,7 +674,7 @@ has materialised.
 
 **Status.** Implemented. Seven speculative crates (`regex`, `glob`,
 `walkdir`, `strsim`, `rhai`, `serde_yaml`, `toml`) were removed in
-the v0.3.0 audit. Re-add only with a concrete user story.
+the v0.4.0 audit. Re-add only with a concrete user story.
 
 ### NFR-8 — Reproducible output
 
@@ -748,7 +748,7 @@ The binary defines no environment variables of its own.
 
 Loaded via `confy` from the OS-appropriate location
 (`~/.config/nhs-number-cli/` on Linux, etc.). Schema is `Config`
-in [`src/app/config.rs`](./src/app/config.rs). At v0.3.0 the only
+in [`src/app/config.rs`](./src/app/config.rs). At v0.4.0 the only
 field is `version: u8 = 1`; future fields will be additive only.
 
 ### 8.7 Exit codes
@@ -879,22 +879,23 @@ replaces what would otherwise live in a `plan.md`.
 
 ### Near term (next minor release, v0.4.0)
 
-*(All near-term v0.4.0 roadmap items have landed in v0.3.x — see
-the work items section.)*
+*(All near-term v0.4.0 roadmap items have shipped — see the work
+items section. The next planning cycle starts when a new item is
+added below.)*
 
 ### Medium term (v0.5.x – v0.9.x)
 
 5. **Counts/summary subcommand.** ~~Read NHS Numbers from stdin and
    emit a brief summary (counts of valid / invalid / parse-error /
    blank) on stdout. Opt in via `--counts`. Default behaviour
-   unchanged (FR-16).~~ **Done.** Landed as FR-17 in v0.3.x. → WI-7.
+   unchanged (FR-16).~~ **Done.** Landed as FR-17 in v0.4.0. → WI-7.
 6. **Optional CSV column selection.** ~~A `--column N` (1-based)
    flag that picks the Nth field of a CSV row as the candidate NHS
-   Number.~~ **Done.** Landed as FR-18 in v0.3.x. → WI-8.
+   Number.~~ **Done.** Landed as FR-18 in v0.4.0. → WI-8.
 7. **Optional structured output.** ~~A `--format json|tsv` flag for
    downstream tools that want machine-readable diagnostics. Must
    not change the default text contract (FR-10).~~ **Done.** Landed
-   as FR-19 in v0.3.x. → WI-9.
+   as FR-19 in v0.4.0. → WI-9.
 
 ### Long term / speculative (no commitment)
 
@@ -913,17 +914,17 @@ spec entries. This section replaces what would otherwise live in a
 
 | ID    | Title                                                              | Status      | Touches                                       |
 | ----- | ------------------------------------------------------------------ | ----------- | --------------------------------------------- |
-| WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Done in v0.3.x | `.github/workflows/ci.yml`; matrix over ubuntu/macos/windows |
-| WI-11 | Make `./examples/run-all.sh` Windows-compatible (or replace it)    | Done in v0.3.x | `examples/*/run.sh` (`.exe` fallback); `.gitattributes`; `.github/workflows/ci.yml` (Windows skip removed) |
-| WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.3.x | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
-| WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Done in v0.3.x | `llms.txt`, `llms.json`; `docs/development/index.md` § Regenerating |
-| WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
-| WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Done in v0.3.x | `src/subcommands/check_lines.rs`             |
-| WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.3.x via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
-| WI-7  | New FR + impl: `--counts` subcommand                               | Done in v0.3.x via FR-17 | `src/subcommands/counts.rs`; FR-17 |
-| WI-8  | New FR + impl: `--column N` CSV-field selector                     | Done in v0.3.x via FR-18 | `src/subcommands/mod.rs::pick_column`; FR-18 |
-| WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Done in v0.3.x via FR-19 | `src/app/args.rs::Format`, `src/subcommands/*`; FR-19 |
-| WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Done in v0.3.x | `.gitignore` (`.DS_Store`, `*.swp`, `*~`)   |
+| WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Done in v0.4.0 | `.github/workflows/ci.yml`; matrix over ubuntu/macos/windows |
+| WI-11 | Make `./examples/run-all.sh` Windows-compatible (or replace it)    | Done in v0.4.0 | `examples/*/run.sh` (`.exe` fallback); `.gitattributes`; `.github/workflows/ci.yml` (Windows skip removed) |
+| WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.4.0 | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
+| WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Done in v0.4.0 | `llms.txt`, `llms.json`; `docs/development/index.md` § Regenerating |
+| WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.4.0 via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
+| WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Done in v0.4.0 | `src/subcommands/check_lines.rs`             |
+| WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.4.0 via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
+| WI-7  | New FR + impl: `--counts` subcommand                               | Done in v0.4.0 via FR-17 | `src/subcommands/counts.rs`; FR-17 |
+| WI-8  | New FR + impl: `--column N` CSV-field selector                     | Done in v0.4.0 via FR-18 | `src/subcommands/mod.rs::pick_column`; FR-18 |
+| WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Done in v0.4.0 via FR-19 | `src/app/args.rs::Format`, `src/subcommands/*`; FR-19 |
+| WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Done in v0.4.0 | `.gitignore` (`.DS_Store`, `*.swp`, `*~`)   |
 
 ### Work item template
 
@@ -971,13 +972,14 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | Single in-crate test helper at `src/testing.rs`                           | Closes WI-2. Removes duplicate-source confusion; new tests have one obvious import path.        |
 | 2026-05-25 | `pub type LineIndex = usize;` for `Error::*::line_number`                 | Closes WI-5. Matches `Iterator::enumerate`; drops the `as i32` cast; user-visible output is byte-identical (non-negative integers render the same).|
 | 2026-05-25 | `.gitignore` excludes `.DS_Store`, `*.swp`, `*~`                          | Closes WI-10. Prevents future macOS/Vim/Emacs cruft from sneaking in via `git add .`. The previously-tracked `src/app/.DS_Store` was already gone from the tree. |
-| 2026-05-26 | Regenerate `llms.txt` / `llms.json` from current `src/`                   | Closes WI-3. Procedure documented in `docs/development/index.md` (`cargo +nightly rustdoc --output-format json` → `rustdoc-md`). Files now reflect v0.3.0 and the modular layout.|
+| 2026-05-26 | Regenerate `llms.txt` / `llms.json` from current `src/`                   | Closes WI-3. Procedure documented in `docs/development/index.md` (`cargo +nightly rustdoc --output-format json` → `rustdoc-md`). Files reflect the current crate version and modular layout; regenerated again at v0.4.0 release.|
 | 2026-05-26 | Apply `cargo fmt` across the tree                                         | Prerequisite for CI's fmt gate. AGENTS/coding-style.md already promised rustfmt-verbatim style; this commit makes the tree consistent with that promise.                       |
 | 2026-05-26 | Add `.github/workflows/ci.yml` over ubuntu/macos/windows                  | Closes WI-1. Gates every PR on `cargo fmt -- --check`, `cargo clippy -- -D warnings`, `cargo test`, and (Linux/macOS only) `./examples/run-all.sh`. Windows example coverage tracked as WI-11.|
 | 2026-05-26 | `--counts` subcommand emits a four-row summary                            | Closes WI-7; adds FR-17. Mutually exclusive with `--line-validation` at the clap layer; no-flag default behaviour unchanged. Replaces the shell wrapper that powered `examples/09-counts-summary/`.|
 | 2026-05-26 | `--column N` selects a comma-separated field from each row                | Closes WI-8; adds FR-18. Honoured by both subcommands. Simple literal-byte split; quoted-CSV is out of scope (use `xsv` upstream). Replaces the `cut -d,` pipeline in `examples/06-csv-column/`.   |
 | 2026-05-26 | `--format text\|json\|tsv` for diagnostics and counts summary             | Closes WI-9; adds FR-19. `text` default preserves FR-10 byte-for-byte. JSON is hand-rolled (no serde_json) to keep the dependency closure small per NFR-7. New runnable example `examples/12-format-output/`. |
 | 2026-05-26 | Runnable examples run on Windows in CI                                    | Closes WI-11. Each `run.sh` retries `target/debug/nhs-number-cli` with a `.exe` suffix; `.gitattributes` keeps shell scripts and fixtures LF-only (except `08-crlf-windows/input-crlf.txt` which is `-text` to preserve its CRLF). CI Windows job now runs `./examples/run-all.sh`. |
+| 2026-05-26 | **Release v0.4.0** — three new flags + CI + tests                         | Minor bump per AGENTS/commit-and-pr.md: three new subcommand/feature flags (`--counts`, `--column N`, `--format`) added without changing the no-flag default. Closes WI-1 through WI-11 (all planned items). `Cargo.toml` and `spec.md` versions updated; `llms.txt` / `llms.json` regenerated. |
 
 ---
 

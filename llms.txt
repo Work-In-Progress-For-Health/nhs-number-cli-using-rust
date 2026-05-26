@@ -1,6 +1,6 @@
 # Crate Documentation
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 
 **Format Version:** 57
 
@@ -13,13 +13,13 @@ allocated to registered patients of NHS England and the NHS Isle of Man.
 
 This tool is a command line interface that parses each standard input line
 into an NHS Number, then validates that the check digit is correct.
- 
+
 References:
- 
+
 * [National Health Service (NHS)](https://en.wikipedia.org/wiki/National_Health_Service)
- 
+
 * [NHS Number](https://en.wikipedia.org/wiki/NHS_number)
- 
+
 
 ## Modules
 
@@ -52,6 +52,9 @@ pub struct Args {
     pub(crate) test: bool,
     pub(crate) log_level: Option<::log::Level>,
     pub(crate) check_lines: Option<bool>,
+    pub(crate) counts: Option<bool>,
+    pub(crate) column: Option<usize>,
+    pub(crate) format: Format,
 }
 ```
 
@@ -62,6 +65,9 @@ pub struct Args {
 | `test` | `bool` | Test flag that sets whether the app prints diagnostics.<br>Example: true means print diagnostics. |
 | `log_level` | `Option<::log::Level>` | Log level: 0=none, 1=error, 2=warn, 3=info, 4=debug, 5=trace.<br>Example: 5 means print debug diagnostics. |
 | `check_lines` | `Option<bool>` | Line validation subcommand: true=run, false=skip |
+| `counts` | `Option<bool>` | Counts subcommand: emit a summary of valid / invalid /<br>parse-error / blank line counts to stdout instead of<br>per-line filtering. Mutually exclusive with `check_lines`. |
+| `column` | `Option<usize>` | 1-based column index. When set, each input line is split on<br>`,` and the value at column N is taken as the candidate NHS<br>Number. When None, the whole line is the candidate. Honoured<br>by every subcommand that classifies lines. |
+| `format` | `Format` | Output format selector. `Text` is the FR-10 stable contract<br>(`Error invalid line N. …` on stderr; key/value rows on stdout<br>from `--counts`). `Json` and `Tsv` are machine-readable<br>alternatives for downstream tooling. |
 
 ##### Implementations
 
@@ -108,6 +114,131 @@ pub struct Args {
 - **RefUnwindSafe**
 - **Send**
 - **Sync**
+- **TryFrom**
+  - ```rust
+    fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
+    ```
+
+- **TryInto**
+  - ```rust
+    fn try_into(self: Self) -> Result<U, <U as TryFrom<T>>::Error> { /* ... */ }
+    ```
+
+- **Unpin**
+- **UnsafeUnpin**
+- **UnwindSafe**
+#### Enum `Format`
+
+Output format for diagnostics (line-validation subcommand) and
+for the counts summary. Plain stdout from line-validation (the
+canonical NHS Numbers) is always text and is not affected.
+
+```rust
+pub enum Format {
+    Text,
+    Json,
+    Tsv,
+}
+```
+
+##### Variants
+
+###### `Text`
+
+FR-10 stable text format. The default; do not change.
+
+###### `Json`
+
+One JSON object per diagnostic line (NDJSON). The counts
+summary is a single JSON object.
+
+###### `Tsv`
+
+Tab-separated values. The line-validation diagnostic stream
+is one row per failure with a fixed five-column schema
+(kind, line_number, nhs_number, line, error). The counts
+summary is one row of column headers followed by one row of
+integer counts.
+
+##### Implementations
+
+###### Methods
+
+- ```rust
+  pub fn from_str(s: &str) -> Self { /* ... */ }
+  ```
+  Map the clap string value to a `Format`. Returns `Text` for
+
+###### Trait Implementations
+
+- **Any**
+  - ```rust
+    fn type_id(self: &Self) -> TypeId { /* ... */ }
+    ```
+
+- **Borrow**
+  - ```rust
+    fn borrow(self: &Self) -> &T { /* ... */ }
+    ```
+
+- **BorrowMut**
+  - ```rust
+    fn borrow_mut(self: &mut Self) -> &mut T { /* ... */ }
+    ```
+
+- **Clone**
+  - ```rust
+    fn clone(self: &Self) -> Format { /* ... */ }
+    ```
+
+- **CloneToUninit**
+  - ```rust
+    unsafe fn clone_to_uninit(self: &Self, dest: *mut u8) { /* ... */ }
+    ```
+
+- **Copy**
+- **Debug**
+  - ```rust
+    fn fmt(self: &Self, f: &mut $crate::fmt::Formatter<''_>) -> $crate::fmt::Result { /* ... */ }
+    ```
+
+- **Default**
+  - ```rust
+    fn default() -> Format { /* ... */ }
+    ```
+
+- **Eq**
+- **Freeze**
+- **From**
+  - ```rust
+    fn from(t: T) -> T { /* ... */ }
+    ```
+    Returns the argument unchanged.
+
+- **Into**
+  - ```rust
+    fn into(self: Self) -> U { /* ... */ }
+    ```
+    Calls `U::from(self)`.
+
+- **PartialEq**
+  - ```rust
+    fn eq(self: &Self, other: &Format) -> bool { /* ... */ }
+    ```
+
+- **RefUnwindSafe**
+- **Send**
+- **StructuralPartialEq**
+- **Sync**
+- **ToOwned**
+  - ```rust
+    fn to_owned(self: &Self) -> T { /* ... */ }
+    ```
+
+  - ```rust
+    fn clone_into(self: &Self, target: &mut T) { /* ... */ }
+    ```
+
 - **TryFrom**
   - ```rust
     fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
@@ -402,8 +533,11 @@ Dispatch to a subcommand based on the parsed `Args`.
 
 Default behaviour with no subcommand flag is the line validator,
 so callers who do nothing more than `cat input.txt | nhs-number-cli`
-keep working. Set `args.check_lines = Some(false)` to suppress it
-(currently not expressible via the CLI).
+keep working. Explicit flags pick a non-default subcommand:
+`--counts` runs `subcommands::counts`, and `--line-validation` is
+the explicit form of the default. The flags are mutually exclusive
+at the clap layer; this function honours that by checking `counts`
+first.
 
 ```rust
 pub(in ::app::run) fn dispatch(args: &crate::app::args::Args) { /* ... */ }
@@ -460,11 +594,11 @@ pub enum Error {
     Parse {
         line_number: usize,
         line: String,
-        error: nhs_number::parse_error::ParseError,
+        error: String,
     },
     Io {
         line_number: usize,
-        error: std::io::Error,
+        error: String,
     },
 }
 ```
@@ -488,7 +622,7 @@ Fields:
 |------|------|---------------|
 | `line_number` | `usize` |  |
 | `line` | `String` |  |
-| `error` | `nhs_number::parse_error::ParseError` |  |
+| `error` | `String` |  |
 
 ###### `Io`
 
@@ -497,7 +631,7 @@ Fields:
 | Name | Type | Documentation |
 |------|------|---------------|
 | `line_number` | `usize` |  |
-| `error` | `std::io::Error` |  |
+| `error` | `String` |  |
 
 ##### Implementations
 
@@ -567,8 +701,114 @@ Fields:
 
 #### Function `check_lines`
 
+Run the line-validation subcommand.
+
+`column` selects a 1-based comma-separated field per row, or
+`None` for whole-line input. `format` selects the wire format
+of stderr diagnostics; `Format::Text` is the FR-10 stable
+contract and the default.
+
 ```rust
-pub fn check_lines() { /* ... */ }
+pub fn check_lines(column: Option<usize>, format: crate::app::args::Format) { /* ... */ }
+```
+
+#### Function `emit_check_digit`
+
+```rust
+pub(in ::subcommands::check_lines) fn emit_check_digit(line_number: usize, nhs_number: &nhs_number::NHSNumber, format: crate::app::args::Format) { /* ... */ }
+```
+
+#### Function `emit_parse`
+
+```rust
+pub(in ::subcommands::check_lines) fn emit_parse(line_number: usize, line: &str, error: &str, format: crate::app::args::Format) { /* ... */ }
+```
+
+#### Function `emit_io`
+
+```rust
+pub(in ::subcommands::check_lines) fn emit_io(line_number: usize, error: &std::io::Error, format: crate::app::args::Format) { /* ... */ }
+```
+
+## Module `counts`
+
+The `--counts` subcommand.
+
+Read NHS Numbers one per line from `stdin`, classify each line,
+and at EOF print a summary on `stdout`.
+
+The text format (default) is four key/value rows:
+
+```text
+valid:       <n>
+invalid:     <n>
+parse-error: <n>
+blank:       <n>
+```
+
+With `--format json` the summary is a single JSON object:
+
+```text
+{"valid":3,"invalid":1,"parse_error":1,"blank":2}
+```
+
+With `--format tsv` the summary is a header row followed by a
+row of integer counts.
+
+```rust
+pub(crate) mod counts { /* ... */ }
+```
+
+### Functions
+
+#### Function `counts`
+
+```rust
+pub fn counts(column: Option<usize>, format: crate::app::args::Format) { /* ... */ }
+```
+
+### Functions
+
+#### Function `pick_column`
+
+Pick a 1-based column from a comma-separated line.
+
+Returns `None` if the line has fewer than `column` fields.
+Splitting is on the literal byte `,`; quoted fields containing
+commas are not supported (out of scope — NHS Numbers never
+contain commas in any documented format).
+
+Callers pass the whole input line if `column` is `None`.
+
+```rust
+pub(crate) fn pick_column(line: &str, column: usize) -> Option<&str> { /* ... */ }
+```
+
+#### Function `json_escape`
+
+Minimal JSON string escaper. Returns the string wrapped in
+double quotes with the standard JSON escape sequences applied.
+
+Only escapes the characters JSON requires: `"`, `\`, and the
+C0 control range (`U+0000`–`U+001F`). NHS Numbers and the
+strings the binary normally formats are ASCII, but raw input
+lines (in the `line` field of parse errors) can contain
+anything, including embedded quotes and control characters.
+
+```rust
+pub(crate) fn json_escape(s: &str) -> String { /* ... */ }
+```
+
+#### Function `tsv_escape`
+
+Sanitise a string for use as a TSV field: replace tab and
+newline characters with spaces so they cannot interfere with
+the field/row separators. Other control characters are left
+alone; downstream tools that care should validate input
+themselves.
+
+```rust
+pub(crate) fn tsv_escape(s: &str) -> String { /* ... */ }
 ```
 
 ## Module `types`
@@ -635,7 +875,7 @@ OPTIMIZE: add pre-allocation logic.
 ```rust
 pub(crate) macro_rules! list {
     /* macro_rules! list {
-    ( $( $x:expr ),* ) => { ... };
+    ( $( $x:expr ),* $(,)? ) => { ... };
 } */
 }
 ```
@@ -883,7 +1123,7 @@ OPTIMIZE: add pre-allocation logic.
 ```rust
 pub(crate) macro_rules! stack {
     /* macro_rules! stack {
-    ( $( $x:expr ),* ) => { ... };
+    ( $( $x:expr ),* $(,)? ) => { ... };
 } */
 }
 ```
