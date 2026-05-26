@@ -1,7 +1,7 @@
 //! Command line argument parsing (CLAP) for the application.
 //!
 //! clap is a crate for command line argument parsing.
-//! See https://docs.rs/clap/
+//! See <https://docs.rs/clap/>
 //!
 //! Clap has a variety of setup approaches:
 //!
