@@ -14,12 +14,17 @@
 //! Modulus 11 check digit. "Parse-error" means the line could not
 //! be parsed as ten digits at all. Read errors are counted under
 //! parse-error.
+//!
+//! Honours the optional `column` argument the same way that
+//! `check_lines` does: when `Some(n)`, each non-blank line is split
+//! on `,` and the n-th (1-based) field is the candidate.
 
+use crate::subcommands::pick_column;
 use nhs_number::NHSNumber;
 use std::io::{self, BufRead};
 use std::str::FromStr;
 
-pub fn counts() {
+pub fn counts(column: Option<usize>) {
     let stdin = io::stdin();
     let mut valid: usize = 0;
     let mut invalid: usize = 0;
@@ -32,7 +37,17 @@ pub fn counts() {
                     blank += 1;
                     continue;
                 }
-                match NHSNumber::from_str(&line) {
+                let candidate = match column {
+                    Some(n) => match pick_column(&line, n) {
+                        Some(s) => s,
+                        None => {
+                            parse_error += 1;
+                            continue;
+                        }
+                    },
+                    None => &line,
+                };
+                match NHSNumber::from_str(candidate) {
                     Ok(nhs_number) => {
                         if nhs_number.validate_check_digit() {
                             valid += 1;

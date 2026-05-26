@@ -40,9 +40,9 @@ pub(crate) fn run() -> Result<(), Error> {
 fn dispatch(args: &Args) {
     trace!("dispatch");
     if args.counts.unwrap_or(false) {
-        crate::subcommands::counts::counts();
+        crate::subcommands::counts::counts(args.column);
     } else if args.check_lines.unwrap_or(true) {
-        crate::subcommands::check_lines::check_lines();
+        crate::subcommands::check_lines::check_lines(args.column);
     }
 }
 

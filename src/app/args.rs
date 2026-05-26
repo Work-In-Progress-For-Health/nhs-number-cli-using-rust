@@ -21,4 +21,10 @@ pub struct Args {
     /// parse-error / blank line counts to stdout instead of
     /// per-line filtering. Mutually exclusive with `check_lines`.
     pub(crate) counts: Option<bool>,
+
+    /// 1-based column index. When set, each input line is split on
+    /// `,` and the value at column N is taken as the candidate NHS
+    /// Number. When None, the whole line is the candidate. Honoured
+    /// by every subcommand that classifies lines.
+    pub(crate) column: Option<usize>,
 }

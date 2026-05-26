@@ -1,3 +1,4 @@
+use crate::subcommands::pick_column;
 use nhs_number::NHSNumber;
 use std::io::{self, BufRead};
 use std::str::FromStr;
@@ -9,7 +10,12 @@ use std::str::FromStr;
 /// narrow it in one place if we ever need to.
 pub type LineIndex = usize;
 
-pub fn check_lines() {
+/// Run the line-validation subcommand.
+///
+/// When `column` is `Some(n)`, each non-blank input line is split on
+/// `,` and the n-th (1-based) field is taken as the candidate NHS
+/// Number. When `None`, the whole line is the candidate.
+pub fn check_lines(column: Option<usize>) {
     let stdin = io::stdin();
     for (i, line) in stdin.lock().lines().enumerate() {
         match line {
@@ -17,7 +23,24 @@ pub fn check_lines() {
                 if line.is_empty() {
                     continue;
                 }
-                match NHSNumber::from_str(&line) {
+                let candidate = match column {
+                    Some(n) => match pick_column(&line, n) {
+                        Some(s) => s,
+                        None => {
+                            eprintln!(
+                                "{}",
+                                Error::Parse {
+                                    line_number: i,
+                                    line: line.clone(),
+                                    error: format!("ColumnMissing({n})"),
+                                }
+                            );
+                            continue;
+                        }
+                    },
+                    None => &line,
+                };
+                match NHSNumber::from_str(candidate) {
                     Ok(nhs_number) => {
                         if nhs_number.validate_check_digit() {
                             println!("{}", nhs_number);
@@ -37,7 +60,7 @@ pub fn check_lines() {
                             Error::Parse {
                                 line_number: i,
                                 line: line.clone(),
-                                error: e,
+                                error: format!("{:?}", e),
                             }
                         );
                     }
@@ -66,11 +89,11 @@ pub enum Error {
         nhs_number: NHSNumber,
     },
 
-    #[error("Error parsing line {line_number}. Error: {error:?}. Line: {line}")]
+    #[error("Error parsing line {line_number}. Error: {error}. Line: {line}")]
     Parse {
         line_number: LineIndex,
         line: String,
-        error: nhs_number::parse_error::ParseError,
+        error: String,
     },
 
     #[error("Error reading line {line_number}. Error: {error}")]

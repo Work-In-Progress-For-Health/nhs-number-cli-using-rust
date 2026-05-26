@@ -83,6 +83,7 @@ The CLI is built with `clap`. The currently-defined flags (FR-13):
 | -------------------------- | --------------------------------------------------------------------------------- |
 | `-l`, `--line-validation`  | Run the line-validation subcommand (the default behaviour).                       |
 | `-c`, `--counts`           | Run the counts subcommand. Mutually exclusive with `--line-validation`. (FR-17)   |
+| `--column N`               | Treat the N-th comma-separated field of each row as the candidate. (FR-18)        |
 | `--test`                   | Print the parsed `Args` and log level to `stdout` (diagnostic).                   |
 | `-v…` / `--verbose…`       | Increase log verbosity: count maps to error/warn/info/debug/trace.                |
 | `-V`, `--version`          | Print the crate version (handled by clap).                                        |

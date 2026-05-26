@@ -404,6 +404,7 @@ public API.
 | -------------------------- | --------------------------------------------------------------------- |
 | `-l`, `--line-validation`  | Run the line-validation subcommand (the default behaviour).           |
 | `-c`, `--counts`           | Run the counts subcommand. Mutually exclusive with `--line-validation`. |
+| `--column N`               | Split each input line on `,` and take the N-th (1-based) field as the candidate. Whole-line behaviour is the default. |
 | `--test`                   | Print the parsed `Args` and log level to `stdout` for diagnostics.    |
 | `-v…`, `--verbose…`        | Increase log verbosity. Count → level: 1=error, 2=warn, 3=info, 4=debug, 5=trace. |
 | `-V`, `--version`          | Print the crate version. Handled by clap.                             |
@@ -529,6 +530,41 @@ running the per-line filter.
 (`--counts` flag); `src/app/run.rs` (`dispatch`);
 `tests/test.rs::fr_17_counts_summary`;
 `examples/09-counts-summary/`.
+
+---
+
+### FR-18 — Column extraction
+
+**Statement.** With `--column N` the binary splits each non-blank
+input line on the literal byte `,` and treats the N-th (1-based)
+field as the candidate NHS Number. When `--column` is omitted the
+candidate is the whole line.
+
+**Acceptance criteria.**
+
+* `--column` accepts a positive integer. `--column 0` is rejected
+  by clap as out of range (clap's `value_parser!(usize)` accepts
+  zero, but a 0-th field has no meaning; `pick_column` returns
+  `None` and the line is reported as a parse error).
+* Honoured by both subcommands: `check_lines` and `counts`.
+* On the line-validation subcommand, the *full* input line appears
+  in `Line: …` on stderr (not just the extracted field), so a
+  downstream script can correlate failures back to the original row.
+* A row with fewer than N comma-separated fields produces a parse
+  error whose `error` payload is `ColumnMissing(N)`.
+* Splitting is on the literal byte `,`. Quoted-CSV (RFC 4180) is
+  out of scope; users with quoted fields should pre-process with a
+  real CSV tool (`xsv`, `csvkit`, `miller`).
+* Header rows are not skipped automatically; pipe through
+  `tail -n +2` (Unix) or equivalent.
+
+**Status.** Implemented.
+
+**Traceability.** `src/subcommands/mod.rs::pick_column`;
+`src/subcommands/check_lines.rs`; `src/subcommands/counts.rs`;
+`src/app/clap.rs` (`--column` flag); `src/app/run.rs` (`dispatch`);
+`tests/test.rs::fr_18_column_extraction`;
+`examples/06-csv-column/`.
 
 ---
 
@@ -784,6 +820,7 @@ the time of writing. Each is tracked toward closure in § 15.
 | FR-15       | `src/main.rs` (`env_logger::init`)              | `examples/11-flag-demo/run.sh` (RUST_LOG=trace asserts log lines + diagnostic) | `examples/11-flag-demo/`              | `docs/usage/index.md` § Logging, `AGENTS/coding-style.md`     |
 | FR-16       | `src/app/run.rs` (`dispatch`), `src/subcommands/mod.rs` | `tests/test.rs` (no-flag default), `src/app/clap.rs::test_check_lines` (explicit flag) | all                                   | `docs/usage/index.md` § Subcommand dispatch, `AGENTS/architecture.md` |
 | FR-17       | `src/subcommands/counts.rs`, `src/app/clap.rs` (`--counts`) | `tests/test.rs::fr_17_counts_summary`, `src/app/clap.rs::test_counts` | `examples/09-counts-summary/`         | `docs/usage/index.md` § Flags, `AGENTS/behavioural-contract.md` |
+| FR-18       | `src/subcommands/mod.rs::pick_column`, `src/subcommands/check_lines.rs`, `src/subcommands/counts.rs`, `src/app/clap.rs` (`--column`) | `tests/test.rs::fr_18_column_extraction` | `examples/06-csv-column/`             | `docs/usage/index.md` § Flags |
 | NFR-1       | `BufRead::lines` iterator                       | (constant-memory not currently asserted)  | n/a                                   | `docs/architecture/index.md`                                  |
 | NFR-2       | `Cargo.toml` (no platform-specific deps)        | manual cross-build                        | n/a                                   | `docs/installation/index.md`                                  |
 | NFR-3       | overall design                                  | `tests/test.rs`                           | `examples/06-csv-column/`             | `docs/usage/index.md`                                         |
@@ -813,11 +850,9 @@ replaces what would otherwise live in a `plan.md`.
    emit a brief summary (counts of valid / invalid / parse-error /
    blank) on stdout. Opt in via `--counts`. Default behaviour
    unchanged (FR-16).~~ **Done.** Landed as FR-17 in v0.3.x. → WI-7.
-6. **Optional CSV column selection.** A `--column N` (1-based) flag
-   that picks the Nth field of a CSV row as the candidate NHS
-   Number. Demonstrated today by piping through `cut`; promoting it
-   to a built-in flag would simplify common pipelines. Adds a new
-   FR.
+6. **Optional CSV column selection.** ~~A `--column N` (1-based)
+   flag that picks the Nth field of a CSV row as the candidate NHS
+   Number.~~ **Done.** Landed as FR-18 in v0.3.x. → WI-8.
 7. **Optional structured output.** A `--format json|tsv` flag for
    downstream tools that want machine-readable diagnostics. Must
    not change the default text contract (FR-10). Adds a new FR.
@@ -847,7 +882,7 @@ spec entries. This section replaces what would otherwise live in a
 | WI-5  | Introduce `pub type LineIndex = usize;` and drop `as i32`          | Done in v0.3.x | `src/subcommands/check_lines.rs`             |
 | WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.3.x via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
 | WI-7  | New FR + impl: `--counts` subcommand                               | Done in v0.3.x via FR-17 | `src/subcommands/counts.rs`; FR-17 |
-| WI-8  | New FR + impl: `--column N` CSV-field selector                     | Speculative | new spec entry; `src/app/clap.rs`; § 14.6     |
+| WI-8  | New FR + impl: `--column N` CSV-field selector                     | Done in v0.3.x via FR-18 | `src/subcommands/mod.rs::pick_column`; FR-18 |
 | WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Speculative | new spec entry; `src/subcommands/`; § 14.7    |
 | WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Done in v0.3.x | `.gitignore` (`.DS_Store`, `*.swp`, `*~`)   |
 
@@ -901,6 +936,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-26 | Apply `cargo fmt` across the tree                                         | Prerequisite for CI's fmt gate. AGENTS/coding-style.md already promised rustfmt-verbatim style; this commit makes the tree consistent with that promise.                       |
 | 2026-05-26 | Add `.github/workflows/ci.yml` over ubuntu/macos/windows                  | Closes WI-1. Gates every PR on `cargo fmt -- --check`, `cargo clippy -- -D warnings`, `cargo test`, and (Linux/macOS only) `./examples/run-all.sh`. Windows example coverage tracked as WI-11.|
 | 2026-05-26 | `--counts` subcommand emits a four-row summary                            | Closes WI-7; adds FR-17. Mutually exclusive with `--line-validation` at the clap layer; no-flag default behaviour unchanged. Replaces the shell wrapper that powered `examples/09-counts-summary/`.|
+| 2026-05-26 | `--column N` selects a comma-separated field from each row                | Closes WI-8; adds FR-18. Honoured by both subcommands. Simple literal-byte split; quoted-CSV is out of scope (use `xsv` upstream). Replaces the `cut -d,` pipeline in `examples/06-csv-column/`.   |
 
 ---
 

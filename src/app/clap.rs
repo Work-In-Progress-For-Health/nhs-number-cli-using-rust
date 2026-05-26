@@ -40,6 +40,12 @@ pub fn app() -> Command {
         .long("counts")
         .action(clap::ArgAction::SetTrue)
     )
+    .arg(Arg::new("column")
+        .help("1-based column index. Each input line is split on `,` and the value at column N is taken as the candidate NHS Number. Whole-line behaviour is the default.\nExample: --column 3")
+        .long("column")
+        .value_name("N")
+        .value_parser(clap::value_parser!(usize))
+    )
     .arg(Arg::new("test")
         .help("Print test output for debugging, verifying, tracing, and the like.\nExample: --test")
         .long("test")
@@ -76,11 +82,13 @@ pub fn args() -> Args {
     } else {
         None
     };
+    let column = matches.get_one::<usize>("column").copied();
     Args {
         test,
         log_level,
         check_lines,
         counts,
+        column,
     }
 }
 

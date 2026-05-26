@@ -154,6 +154,38 @@ fn fr_11_stream_separation() {
     assert!(stderr[0].ends_with("999 123 4561"));
 }
 
+/// FR-18 — `--column N` extracts the N-th comma-separated field
+/// from each input line before parsing. Honoured by both subcommands;
+/// a row with fewer fields than `N` produces a `ColumnMissing(N)`
+/// parse error.
+#[test]
+fn fr_18_column_extraction() {
+    let mut command = Command::new(&*COMMAND_OS)
+        .args(["--column", "3"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    if let Some(mut stdin) = command.stdin.take() {
+        stdin
+            .write_all(b"1,Alice,999 999 9999\n2,Bob,999 123 4561\n3,short\n")
+            .unwrap();
+    }
+    let output = command.wait_with_output().unwrap();
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    assert_eq!(stdout, "999 999 9999\n");
+    assert!(
+        stderr.contains("Error invalid line 1.") && stderr.contains("999 123 4561"),
+        "stderr was: {stderr:?}"
+    );
+    assert!(
+        stderr.contains("Error parsing line 2.") && stderr.contains("ColumnMissing(3)"),
+        "stderr was: {stderr:?}"
+    );
+}
+
 /// FR-17 — `--counts` emits a four-row summary to stdout and
 /// nothing to stderr. The default (no flag) and `--line-validation`
 /// behaviour must be unchanged; only the explicit flag opts in.
