@@ -1,24 +1,18 @@
 # Crate Documentation
 
-**Version:** 0.2.0
+**Version:** 0.3.0
 
 **Format Version:** 57
 
 # Module `nhs_number_cli`
 
 # NHS Number command line interface (cli)
- 
+
 A National Health Service (NHS) Number is a unique ten-digit identifier
 allocated to registered patients of NHS England and the NHS Isle of Man.
- 
-This tool is a command line interface that parses each standard input line into
-an NHS number, then validates the check digit is correct.
- 
-* If the line is a valid NHS number, then print it.
- 
-* If the line is an invalid NHS Number, or is unparseable, then print an error message.
- 
-* If the line is blank, then skip it.
+
+This tool is a command line interface that parses each standard input line
+into an NHS Number, then validates that the check digit is correct.
  
 References:
  
@@ -26,31 +20,872 @@ References:
  
 * [NHS Number](https://en.wikipedia.org/wiki/NHS_number)
  
-## Examples
- 
-Suppose you have a text file `input.txt` that contains one NNS Number per line,
-and some may be valid or invalid:
 
- 
-```txt
-999 123 4560
-999 123 4561
+## Modules
+
+## Module `app`
+
+```rust
+pub(crate) mod app { /* ... */ }
 ```
- 
-You can parse each line and validate it:
- 
-```sh
-cat input.txt | nhs-number-cli
+
+### Modules
+
+## Module `args`
+
+Args for the application.
+
+These args correspond to the matches in the file `clap.rs`.
+We have these args in their own file in order to be flexible,
+such as being able to start our app with other arg parsers.
+
+```rust
+pub(crate) mod args { /* ... */ }
 ```
- 
-The output is one stdout line and one stderr line: 
- 
-```stdout
-999 123 4560
+
+### Types
+
+#### Struct `Args`
+
+```rust
+pub struct Args {
+    pub(crate) test: bool,
+    pub(crate) log_level: Option<::log::Level>,
+    pub(crate) check_lines: Option<bool>,
+}
 ```
- 
-```stderr
-Error invalid line 1. Error: validate check digit failed. NHS Number: 999 123 4561
+
+##### Fields
+
+| Name | Type | Documentation |
+|------|------|---------------|
+| `test` | `bool` | Test flag that sets whether the app prints diagnostics.<br>Example: true means print diagnostics. |
+| `log_level` | `Option<::log::Level>` | Log level: 0=none, 1=error, 2=warn, 3=info, 4=debug, 5=trace.<br>Example: 5 means print debug diagnostics. |
+| `check_lines` | `Option<bool>` | Line validation subcommand: true=run, false=skip |
+
+##### Implementations
+
+###### Trait Implementations
+
+- **Any**
+  - ```rust
+    fn type_id(self: &Self) -> TypeId { /* ... */ }
+    ```
+
+- **Borrow**
+  - ```rust
+    fn borrow(self: &Self) -> &T { /* ... */ }
+    ```
+
+- **BorrowMut**
+  - ```rust
+    fn borrow_mut(self: &mut Self) -> &mut T { /* ... */ }
+    ```
+
+- **Debug**
+  - ```rust
+    fn fmt(self: &Self, f: &mut $crate::fmt::Formatter<''_>) -> $crate::fmt::Result { /* ... */ }
+    ```
+
+- **Default**
+  - ```rust
+    fn default() -> Args { /* ... */ }
+    ```
+
+- **Freeze**
+- **From**
+  - ```rust
+    fn from(t: T) -> T { /* ... */ }
+    ```
+    Returns the argument unchanged.
+
+- **Into**
+  - ```rust
+    fn into(self: Self) -> U { /* ... */ }
+    ```
+    Calls `U::from(self)`.
+
+- **RefUnwindSafe**
+- **Send**
+- **Sync**
+- **TryFrom**
+  - ```rust
+    fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
+    ```
+
+- **TryInto**
+  - ```rust
+    fn try_into(self: Self) -> Result<U, <U as TryFrom<T>>::Error> { /* ... */ }
+    ```
+
+- **Unpin**
+- **UnsafeUnpin**
+- **UnwindSafe**
+## Module `clap`
+
+Command line argument parsing (CLAP) for the application.
+
+clap is a crate for command line argument parsing.
+See https://docs.rs/clap/
+
+Clap has a variety of setup approaches:
+
+  * via typical functions, which favors advanced uses yet is verbose.
+  * via usage strings, which looks more like writing documentation.
+  * via macros, which is fast and less verbose, yet atypical to read.
+  * via YAML file, which favors localization and text file readability.
+
+We prefer the typical functions, because they provide maximum capability,
+and in our experience are the easiest for Rust IDEs to read and debug.
+
+We favor our convention of doing clap setup in a file named `clap.rs`,
+rather than in `main.rs`, because we like the separation of concerns.
+
+```rust
+pub(crate) mod clap { /* ... */ }
+```
+
+### Functions
+
+#### Function `app`
+
+Create a clap app.
+
+```rust
+pub fn app() -> clap::Command { /* ... */ }
+```
+
+#### Function `args`
+
+Parse argv with the clap `Command` and project the matches into `Args`.
+
+```rust
+pub fn args() -> crate::app::args::Args { /* ... */ }
+```
+
+## Module `config`
+
+Configuration for the application.
+
+Our source code convention is using this file `config.rs` to
+define `struct Config` and `impl std::default::Default`.
+
+We manage configuration file settings via the `confy` crate.
+See the project file `confy.rs` for testing our `confy` loading.
+
+```rust
+pub(crate) mod config { /* ... */ }
+```
+
+### Types
+
+#### Struct `Config`
+
+```rust
+pub(crate) struct Config {
+    pub(in ::app::config) version: u8,
+}
+```
+
+##### Fields
+
+| Name | Type | Documentation |
+|------|------|---------------|
+| `version` | `u8` |  |
+
+##### Implementations
+
+###### Trait Implementations
+
+- **Any**
+  - ```rust
+    fn type_id(self: &Self) -> TypeId { /* ... */ }
+    ```
+
+- **Borrow**
+  - ```rust
+    fn borrow(self: &Self) -> &T { /* ... */ }
+    ```
+
+- **BorrowMut**
+  - ```rust
+    fn borrow_mut(self: &mut Self) -> &mut T { /* ... */ }
+    ```
+
+- **Debug**
+  - ```rust
+    fn fmt(self: &Self, f: &mut $crate::fmt::Formatter<''_>) -> $crate::fmt::Result { /* ... */ }
+    ```
+
+- **Default**
+  - ```rust
+    fn default() -> Self { /* ... */ }
+    ```
+
+- **Deserialize**
+  - ```rust
+    fn deserialize<__D>(__deserializer: __D) -> _serde::__private228::Result<Self, <__D as >::Error>
+where
+    __D: _serde::Deserializer<''de> { /* ... */ }
+    ```
+
+- **DeserializeOwned**
+- **Freeze**
+- **From**
+  - ```rust
+    fn from(t: T) -> T { /* ... */ }
+    ```
+    Returns the argument unchanged.
+
+- **Into**
+  - ```rust
+    fn into(self: Self) -> U { /* ... */ }
+    ```
+    Calls `U::from(self)`.
+
+- **RefUnwindSafe**
+- **Send**
+- **Serialize**
+  - ```rust
+    fn serialize<__S>(self: &Self, __serializer: __S) -> _serde::__private228::Result<<__S as >::Ok, <__S as >::Error>
+where
+    __S: _serde::Serializer { /* ... */ }
+    ```
+
+- **Sync**
+- **TryFrom**
+  - ```rust
+    fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
+    ```
+
+- **TryInto**
+  - ```rust
+    fn try_into(self: Self) -> Result<U, <U as TryFrom<T>>::Error> { /* ... */ }
+    ```
+
+- **Unpin**
+- **UnsafeUnpin**
+- **UnwindSafe**
+## Module `confy`
+
+Configuration test of the `confy` crate for the application.
+
+Our source code convention is using this file `confy.rs`
+in order to test configuration file loading and parsing.
+
+See also the project file `config.rs` for our `Config` struct.
+
+```rust
+pub(crate) mod confy { /* ... */ }
+```
+
+## Module `run`
+
+Run the app
+
+```rust
+pub(crate) mod run { /* ... */ }
+```
+
+### Types
+
+#### Enum `Error`
+
+```rust
+pub enum Error {
+    Confy(::confy::ConfyError),
+}
+```
+
+##### Variants
+
+###### `Confy`
+
+Fields:
+
+| Index | Type | Documentation |
+|-------|------|---------------|
+| 0 | `::confy::ConfyError` |  |
+
+##### Implementations
+
+###### Trait Implementations
+
+- **Any**
+  - ```rust
+    fn type_id(self: &Self) -> TypeId { /* ... */ }
+    ```
+
+- **Borrow**
+  - ```rust
+    fn borrow(self: &Self) -> &T { /* ... */ }
+    ```
+
+- **BorrowMut**
+  - ```rust
+    fn borrow_mut(self: &mut Self) -> &mut T { /* ... */ }
+    ```
+
+- **Debug**
+  - ```rust
+    fn fmt(self: &Self, f: &mut $crate::fmt::Formatter<''_>) -> $crate::fmt::Result { /* ... */ }
+    ```
+
+- **Display**
+  - ```rust
+    fn fmt(self: &Self, __formatter: &mut ::core::fmt::Formatter<''_>) -> ::core::fmt::Result { /* ... */ }
+    ```
+
+- **Error**
+- **Freeze**
+- **From**
+  - ```rust
+    fn from(t: T) -> T { /* ... */ }
+    ```
+    Returns the argument unchanged.
+
+- **Into**
+  - ```rust
+    fn into(self: Self) -> U { /* ... */ }
+    ```
+    Calls `U::from(self)`.
+
+- **RefUnwindSafe**
+- **Send**
+- **Sync**
+- **ToString**
+  - ```rust
+    fn to_string(self: &Self) -> String { /* ... */ }
+    ```
+
+- **TryFrom**
+  - ```rust
+    fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
+    ```
+
+- **TryInto**
+  - ```rust
+    fn try_into(self: Self) -> Result<U, <U as TryFrom<T>>::Error> { /* ... */ }
+    ```
+
+- **Unpin**
+- **UnsafeUnpin**
+- **UnwindSafe**
+### Functions
+
+#### Function `run`
+
+Run everything.
+
+Steps:
+
+  * Initialize configuration.
+
+  * Initialize arguments.
+
+
+Example:
+
+```
+run();
+//-> Initialize everything then run the subcommands.
+```
+
+
+```rust
+pub(crate) fn run() -> Result<(), Error> { /* ... */ }
+```
+
+#### Function `dispatch`
+
+Dispatch to a subcommand based on the parsed `Args`.
+
+Default behaviour with no subcommand flag is the line validator,
+so callers who do nothing more than `cat input.txt | nhs-number-cli`
+keep working. Set `args.check_lines = Some(false)` to suppress it
+(currently not expressible via the CLI).
+
+```rust
+pub(in ::app::run) fn dispatch(args: &crate::app::args::Args) { /* ... */ }
+```
+
+#### Function `initialize_configuration`
+
+```rust
+pub(in ::app::run) fn initialize_configuration() -> Result<crate::app::config::Config, Error> { /* ... */ }
+```
+
+#### Function `initialize_arguments`
+
+```rust
+pub(in ::app::run) fn initialize_arguments() -> crate::app::args::Args { /* ... */ }
+```
+
+## Module `subcommands`
+
+```rust
+pub(crate) mod subcommands { /* ... */ }
+```
+
+### Modules
+
+## Module `check_lines`
+
+```rust
+pub(crate) mod check_lines { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `LineIndex`
+
+Zero-based index of a line of input as it is read from `stdin`.
+
+`Iterator::enumerate` produces `usize`, and that is what scripts
+see on stderr too. Centralising the type here lets us widen or
+narrow it in one place if we ever need to.
+
+```rust
+pub type LineIndex = usize;
+```
+
+#### Enum `Error`
+
+```rust
+pub enum Error {
+    CheckDigit {
+        line_number: usize,
+        nhs_number: nhs_number::NHSNumber,
+    },
+    Parse {
+        line_number: usize,
+        line: String,
+        error: nhs_number::parse_error::ParseError,
+    },
+    Io {
+        line_number: usize,
+        error: std::io::Error,
+    },
+}
+```
+
+##### Variants
+
+###### `CheckDigit`
+
+Fields:
+
+| Name | Type | Documentation |
+|------|------|---------------|
+| `line_number` | `usize` |  |
+| `nhs_number` | `nhs_number::NHSNumber` |  |
+
+###### `Parse`
+
+Fields:
+
+| Name | Type | Documentation |
+|------|------|---------------|
+| `line_number` | `usize` |  |
+| `line` | `String` |  |
+| `error` | `nhs_number::parse_error::ParseError` |  |
+
+###### `Io`
+
+Fields:
+
+| Name | Type | Documentation |
+|------|------|---------------|
+| `line_number` | `usize` |  |
+| `error` | `std::io::Error` |  |
+
+##### Implementations
+
+###### Trait Implementations
+
+- **Any**
+  - ```rust
+    fn type_id(self: &Self) -> TypeId { /* ... */ }
+    ```
+
+- **Borrow**
+  - ```rust
+    fn borrow(self: &Self) -> &T { /* ... */ }
+    ```
+
+- **BorrowMut**
+  - ```rust
+    fn borrow_mut(self: &mut Self) -> &mut T { /* ... */ }
+    ```
+
+- **Debug**
+  - ```rust
+    fn fmt(self: &Self, f: &mut $crate::fmt::Formatter<''_>) -> $crate::fmt::Result { /* ... */ }
+    ```
+
+- **Display**
+  - ```rust
+    fn fmt(self: &Self, __formatter: &mut ::core::fmt::Formatter<''_>) -> ::core::fmt::Result { /* ... */ }
+    ```
+
+- **Error**
+- **Freeze**
+- **From**
+  - ```rust
+    fn from(t: T) -> T { /* ... */ }
+    ```
+    Returns the argument unchanged.
+
+- **Into**
+  - ```rust
+    fn into(self: Self) -> U { /* ... */ }
+    ```
+    Calls `U::from(self)`.
+
+- **RefUnwindSafe**
+- **Send**
+- **Sync**
+- **ToString**
+  - ```rust
+    fn to_string(self: &Self) -> String { /* ... */ }
+    ```
+
+- **TryFrom**
+  - ```rust
+    fn try_from(value: U) -> Result<T, <T as TryFrom<U>>::Error> { /* ... */ }
+    ```
+
+- **TryInto**
+  - ```rust
+    fn try_into(self: Self) -> Result<U, <U as TryFrom<T>>::Error> { /* ... */ }
+    ```
+
+- **Unpin**
+- **UnsafeUnpin**
+- **UnwindSafe**
+### Functions
+
+#### Function `check_lines`
+
+```rust
+pub fn check_lines() { /* ... */ }
+```
+
+## Module `types`
+
+```rust
+pub(crate) mod types { /* ... */ }
+```
+
+### Modules
+
+## Module `list`
+
+**Attributes:**
+
+- `Other("#[attr = MacroUse {arguments: UseAll}]")`
+
+```rust
+pub(crate) mod list { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `List`
+
+**Attributes:**
+
+- `Other("#[allow(dead_code)]")`
+
+`List` is our typical list collection.
+
+This is implemented in Rust by using `Vec`.
+
+Example:
+
+```
+let my_list: List<i32> = List::new();
+```
+
+
+```rust
+pub type List<T> = std::vec::Vec<T>;
+```
+
+### Macros
+
+#### Macro `list`
+
+**Attributes:**
+
+- `Other("#[allow(unused_macros)]")`
+
+Create a typical list collection with elements.
+
+Example:
+
+```
+let x: List<i32> = list!(1, 2);
+assert!(x.contains(&1));
+```
+
+OPTIMIZE: add pre-allocation logic.
+
+
+```rust
+pub(crate) macro_rules! list {
+    /* macro_rules! list {
+    ( $( $x:expr ),* ) => { ... };
+} */
+}
+```
+
+## Module `map`
+
+**Attributes:**
+
+- `Other("#[attr = MacroUse {arguments: UseAll}]")`
+
+```rust
+pub(crate) mod map { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `Map`
+
+**Attributes:**
+
+- `Other("#[allow(dead_code)]")`
+
+`Map` is our typical map collection and is an ordered map.
+
+This is implemented in Rust by using `BTreeMap`.
+
+Example:
+
+```
+let my_map: Map<i32, i32> = Map::new();
+```
+
+
+```rust
+pub type Map<K, V> = std::collections::BTreeMap<K, V>;
+```
+
+### Macros
+
+#### Macro `map`
+
+**Attributes:**
+
+- `Other("#[allow(unused_macros)]")`
+
+Create a typical map collection with elements.
+
+Example:
+
+```
+let x: Map<i32, i32> = map!(
+    1 => 2,
+    3 => 4,
+);
+assert_eq!(x[1], 2);
+```
+
+OPTIMIZE: add pre-allocation logic.
+
+
+```rust
+pub(crate) macro_rules! map {
+    /* macro_rules! map {
+    ( $( $k:expr => $v:expr ),* ) => { ... };
+} */
+}
+```
+
+## Module `queue`
+
+**Attributes:**
+
+- `Other("#[attr = MacroUse {arguments: UseAll}]")`
+
+```rust
+pub(crate) mod queue { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `Queue`
+
+**Attributes:**
+
+- `Other("#[allow(dead_code)]")`
+
+`Queue` is our typical queue collection and is a double-ended queue.
+
+This is implemented in Rust by using `VecDeque`.
+
+Example:
+
+```
+let my_queue: Queue<i32> = Queue::new();
+```
+
+
+```rust
+pub type Queue<T> = std::collections::VecDeque<T>;
+```
+
+### Macros
+
+#### Macro `queue`
+
+**Attributes:**
+
+- `Other("#[allow(unused_macros)]")`
+
+Create a typical queue collection with elements.
+
+Example:
+
+```
+let x: Queue<i32> = queue!(1, 2);
+assert!(x.contains(&1));
+```
+
+OPTIMIZE: add pre-allocation logic.
+
+
+```rust
+pub(crate) macro_rules! queue {
+    /* macro_rules! queue {
+    ( $( $x:expr ),* ) => { ... };
+} */
+}
+```
+
+## Module `set`
+
+**Attributes:**
+
+- `Other("#[attr = MacroUse {arguments: UseAll}]")`
+
+```rust
+pub(crate) mod set { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `Set`
+
+**Attributes:**
+
+- `Other("#[allow(dead_code)]")`
+
+`Set` is our typical set collection and is an ordered set.
+
+This is implemented in Rust by using `BTreeSet`.
+
+Example:
+
+```
+let my_set: Set<i32> = Set::new();
+```
+
+
+```rust
+pub type Set<T> = std::collections::BTreeSet<T>;
+```
+
+### Macros
+
+#### Macro `set`
+
+**Attributes:**
+
+- `Other("#[allow(unused_macros)]")`
+
+Create a typical set collection with elements.
+
+Example:
+
+```
+let x: Set<i32> = set!(1, 2);
+assert!(x.contains(&1));
+assert!(x.contains(&2));
+```
+
+OPTIMIZE: add pre-allocation logic.
+
+
+```rust
+pub(crate) macro_rules! set {
+    /* macro_rules! set {
+    ( $( $x:expr ),* ) => { ... };
+} */
+}
+```
+
+## Module `stack`
+
+**Attributes:**
+
+- `Other("#[attr = MacroUse {arguments: UseAll}]")`
+
+```rust
+pub(crate) mod stack { /* ... */ }
+```
+
+### Types
+
+#### Type Alias `Stack`
+
+**Attributes:**
+
+- `Other("#[allow(dead_code)]")`
+
+`Stack` is our typical stack collection.
+
+This is implemented in Rust by using `Vec`.
+
+Example:
+
+```
+let my_stack: Stack<i32> = Stack::new();
+```
+
+
+```rust
+pub type Stack<T> = std::vec::Vec<T>;
+```
+
+### Macros
+
+#### Macro `stack`
+
+**Attributes:**
+
+- `Other("#[allow(unused_macros)]")`
+
+Create a typical stack collection with elements.
+
+Example:
+
+```
+let x: Stack<i32> = stack!(1, 2);
+assert!(x.contains(&1));
+```
+
+OPTIMIZE: add pre-allocation logic.
+
+
+```rust
+pub(crate) macro_rules! stack {
+    /* macro_rules! stack {
+    ( $( $x:expr ),* ) => { ... };
+} */
+}
 ```
 
 ## Functions

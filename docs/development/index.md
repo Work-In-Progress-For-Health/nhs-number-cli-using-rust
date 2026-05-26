@@ -63,6 +63,36 @@ See [`examples/README.md`](../examples/README.md) for the layout. Each
 example is a self-contained directory with its own `README.md`, an
 `input.txt`, an `expected-stdout.txt`, and an `expected-stderr.txt`.
 
+## Regenerating `llms.txt` and `llms.json`
+
+The two top-level files [`llms.txt`](../../llms.txt) and
+[`llms.json`](../../llms.json) are rustdoc snapshots aimed at LLM-style
+consumers (and at human readers who want a single-file index of the
+crate's docs). They are not hand-edited; regenerate them whenever
+public-ish items, doc comments, or the crate version change.
+
+Requirements:
+
+* A nightly Rust toolchain (rustdoc's JSON output is unstable).
+* The [`rustdoc-md`](https://crates.io/crates/rustdoc-md) tool:
+  `cargo install rustdoc-md`.
+
+Procedure:
+
+```sh
+# 1. Produce target/doc/nhs_number_cli.json.
+cargo +nightly rustdoc -- --output-format json -Z unstable-options
+
+# 2. Promote the JSON to the repo root.
+cp target/doc/nhs_number_cli.json llms.json
+
+# 3. Render Markdown from the JSON.
+rustdoc-md --path llms.json --output llms.txt
+```
+
+Commit both files in the same change as the doc-comment or version
+edit that prompted the regeneration. Do not edit them by hand.
+
 ## Releasing
 
 1. Bump `version` in `Cargo.toml`.
