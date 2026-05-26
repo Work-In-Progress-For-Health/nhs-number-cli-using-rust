@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel an in-flight run when a new push lands on the same ref. Saves
+# CI minutes when contributors push fixup commits in quick succession.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable + rustfmt + clippy)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+
+      # Pre-commit checklist from AGENTS/commit-and-pr.md:
+      #   cargo fmt
+      #   cargo clippy -- -D warnings
+      #   cargo test
+      #   ./examples/run-all.sh
+
+      - name: cargo fmt -- --check
+        run: cargo fmt -- --check
+
+      - name: cargo clippy -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test
+
+      # The example run.sh scripts assume a POSIX shell and a
+      # `target/debug/nhs-number-cli` (no `.exe`) path. Windows
+      # support for `examples/run-all.sh` is tracked as a separate
+      # work item; for now we only exercise it on Linux and macOS.
+      - name: ./examples/run-all.sh
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cargo build
+          ./examples/run-all.sh

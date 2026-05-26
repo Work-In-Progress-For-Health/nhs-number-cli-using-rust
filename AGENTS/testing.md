@@ -130,17 +130,20 @@ and collects exit codes.
 
 ## CI
 
-There is currently no CI configured in this repo. Until there is, the
-expectation is:
+GitHub Actions runs the same pre-commit checks on every push and PR.
+The workflow is [`.github/workflows/ci.yml`](../.github/workflows/ci.yml);
+it matrices over `ubuntu-latest`, `macos-latest`, and `windows-latest`
+and runs:
 
-* Run `cargo fmt`, `cargo clippy -- -D warnings`, `cargo test`, and
-  `./examples/run-all.sh` locally before pushing.
-* Open a draft PR if any of those fail and you want a second pair of
-  eyes.
+* `cargo fmt -- --check`
+* `cargo clippy --all-targets -- -D warnings`
+* `cargo test`
+* `./examples/run-all.sh` (Linux + macOS only — Windows skipped
+  pending WI-11 in `spec.md`)
 
-When CI is added, the workflow file should live at
-`.github/workflows/ci.yml` and run all four commands on
-`ubuntu-latest`, `macos-latest`, and `windows-latest`. Tracked in
-`spec.md` § 11 "Known gaps and TODOs".
+A red Windows job for the examples step does **not** count as
+failure today, but `cargo test`'s coverage of FR-2/7/9/11/12 means
+the contract is still gated on Windows. Run the same four commands
+locally before pushing — relying on CI to find drift slows reviews.
 
 <!-- cSpell:ignore assertables LazyLock -->

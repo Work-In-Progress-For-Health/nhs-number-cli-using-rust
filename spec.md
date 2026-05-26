@@ -696,11 +696,12 @@ following hold:
 These are deliberate divergences between the spec and the code at
 the time of writing. Each is tracked toward closure in § 15.
 
-* **CI.** No `.github/workflows/ci.yml` is currently committed.
-  Before v0.4.0, add one that runs `cargo fmt`,
-  `cargo clippy -- -D warnings`, `cargo test`, and
-  `./examples/run-all.sh` on Linux, macOS, and Windows. (Work item:
-  WI-1.)
+* **`./examples/run-all.sh` is POSIX-shell only.** The shell harness
+  hardcodes `target/debug/nhs-number-cli` (no `.exe` suffix) and uses
+  shell features that don't have direct cmd.exe equivalents. CI skips
+  the step on Windows. Either teach the `run.sh` scripts to append
+  `.exe` when present, or replace the harness with a Rust test binary
+  that re-uses `tests/test.rs`'s `Run` helper. (Work item: WI-11.)
 
 ## 12. Change management
 
@@ -761,8 +762,9 @@ replaces what would otherwise live in a `plan.md`.
 
 ### Near term (next minor release, v0.4.0)
 
-1. **Continuous integration.** A green CI run on Linux, macOS, and
-   Windows for every PR. → WI-1.
+1. **Windows examples coverage.** Make `examples/run-all.sh` (or a
+   replacement) executable on Windows so the CI Windows job runs the
+   same set of checks as Linux/macOS. → WI-11.
 
 ### Medium term (v0.5.x – v0.9.x)
 
@@ -796,7 +798,8 @@ spec entries. This section replaces what would otherwise live in a
 
 | ID    | Title                                                              | Status      | Touches                                       |
 | ----- | ------------------------------------------------------------------ | ----------- | --------------------------------------------- |
-| WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Planned     | new file; § 11; § 14.1                        |
+| WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Done in v0.3.x | `.github/workflows/ci.yml`; matrix over ubuntu/macos/windows |
+| WI-11 | Make `./examples/run-all.sh` Windows-compatible (or replace it)    | Planned     | `examples/*/run.sh`, `examples/run-all.sh`, CI job |
 | WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.3.x | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
 | WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Done in v0.3.x | `llms.txt`, `llms.json`; `docs/development/index.md` § Regenerating |
 | WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
@@ -854,6 +857,8 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-25 | `pub type LineIndex = usize;` for `Error::*::line_number`                 | Closes WI-5. Matches `Iterator::enumerate`; drops the `as i32` cast; user-visible output is byte-identical (non-negative integers render the same).|
 | 2026-05-25 | `.gitignore` excludes `.DS_Store`, `*.swp`, `*~`                          | Closes WI-10. Prevents future macOS/Vim/Emacs cruft from sneaking in via `git add .`. The previously-tracked `src/app/.DS_Store` was already gone from the tree. |
 | 2026-05-26 | Regenerate `llms.txt` / `llms.json` from current `src/`                   | Closes WI-3. Procedure documented in `docs/development/index.md` (`cargo +nightly rustdoc --output-format json` → `rustdoc-md`). Files now reflect v0.3.0 and the modular layout.|
+| 2026-05-26 | Apply `cargo fmt` across the tree                                         | Prerequisite for CI's fmt gate. AGENTS/coding-style.md already promised rustfmt-verbatim style; this commit makes the tree consistent with that promise.                       |
+| 2026-05-26 | Add `.github/workflows/ci.yml` over ubuntu/macos/windows                  | Closes WI-1. Gates every PR on `cargo fmt -- --check`, `cargo clippy -- -D warnings`, `cargo test`, and (Linux/macOS only) `./examples/run-all.sh`. Windows example coverage tracked as WI-11.|
 
 ---
 

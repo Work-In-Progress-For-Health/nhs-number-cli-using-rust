@@ -41,7 +41,8 @@ cargo fmt
 cargo clippy -- -D warnings
 ```
 
-CI (when added) should run both before merging.
+CI runs both on every push and PR. See
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
 
 ## Cross-compiling for Windows
 
