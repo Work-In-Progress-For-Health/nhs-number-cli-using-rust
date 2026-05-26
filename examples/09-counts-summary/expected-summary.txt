@@ -1,3 +1,4 @@
-valid:   4
-invalid: 2
-blank:   2
+valid:       4
+invalid:     1
+parse-error: 1
+blank:       2

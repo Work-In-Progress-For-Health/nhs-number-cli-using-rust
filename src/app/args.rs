@@ -16,4 +16,9 @@ pub struct Args {
 
     /// Line validation subcommand: true=run, false=skip
     pub(crate) check_lines: Option<bool>,
+
+    /// Counts subcommand: emit a summary of valid / invalid /
+    /// parse-error / blank line counts to stdout instead of
+    /// per-line filtering. Mutually exclusive with `check_lines`.
+    pub(crate) counts: Option<bool>,
 }

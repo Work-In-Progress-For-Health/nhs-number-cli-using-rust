@@ -154,6 +154,39 @@ fn fr_11_stream_separation() {
     assert!(stderr[0].ends_with("999 123 4561"));
 }
 
+/// FR-17 — `--counts` emits a four-row summary to stdout and
+/// nothing to stderr. The default (no flag) and `--line-validation`
+/// behaviour must be unchanged; only the explicit flag opts in.
+#[test]
+fn fr_17_counts_summary() {
+    let mut command = Command::new(&*COMMAND_OS)
+        .arg("--counts")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    if let Some(mut stdin) = command.stdin.take() {
+        stdin
+            .write_all(
+                b"999 999 9999\n999 000 0069\n\n999 123 4561\nnot-an-nhs-number\n\n999 555 0016\n",
+            )
+            .unwrap();
+    }
+    let output = command.wait_with_output().unwrap();
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("valid:       3"), "stdout was: {stdout:?}");
+    assert!(stdout.contains("invalid:     1"), "stdout was: {stdout:?}");
+    assert!(stdout.contains("parse-error: 1"), "stdout was: {stdout:?}");
+    assert!(stdout.contains("blank:       2"), "stdout was: {stdout:?}");
+    assert!(
+        output.stderr.is_empty(),
+        "stderr should be empty in --counts mode; got {:?}",
+        String::from_utf8_lossy(&output.stderr),
+    );
+    assert!(output.status.success());
+}
+
 /// FR-12 — exit code is `0` even when the input contains invalid
 /// lines. Callers that need a non-zero exit on bad input wrap the
 /// binary (see `examples/07-fail-on-invalid/`).

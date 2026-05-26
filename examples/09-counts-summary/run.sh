@@ -1,11 +1,14 @@
 #!/usr/bin/env sh
+# Pipe input.txt through `nhs-number-cli --counts` and diff the
+# observed summary against expected-summary.txt.
 set -eu
 here="$(cd "$(dirname "$0")" && pwd)"
-chmod +x "$here/summary.sh"
+bin="$here/../../target/debug/nhs-number-cli"
+[ -x "$bin" ] || { echo "Binary not found at $bin — run 'cargo build' first." >&2; exit 2; }
 
 tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 
-"$here/summary.sh" < "$here/input.txt" > "$tmp"
+"$bin" --counts < "$here/input.txt" > "$tmp"
 diff -u "$here/expected-summary.txt" "$tmp"
 echo "OK"

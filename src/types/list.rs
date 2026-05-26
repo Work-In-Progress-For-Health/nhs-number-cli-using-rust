@@ -24,14 +24,8 @@ pub type List<T> = std::vec::Vec<T>;
 ///
 #[allow(unused_macros)]
 macro_rules! list {
-    ( $( $x:expr ),* ) => {
-        {
-            let mut m = std::vec::Vec::new();
-            $(
-                m.push($x);
-            )*
-            m
-        }
+    ( $( $x:expr ),* $(,)? ) => {
+        std::vec![$($x),*]
     };
 }
 

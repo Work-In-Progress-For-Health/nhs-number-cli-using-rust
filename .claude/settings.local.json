@@ -23,7 +23,14 @@
       "Bash(command -v cargo-machete)",
       "Bash(cargo machete *)",
       "Read(//tmp/**)",
-      "Bash(echo \"exit=$?\")"
+      "Bash(echo \"exit=$?\")",
+      "Bash(echo \"clippy exit=$?\")",
+      "Bash(./target/debug/nhs-number-cli --version)",
+      "Bash(./target/debug/nhs-number-cli --help)",
+      "Bash(./target/debug/nhs-number-cli --test --verbose --verbose)",
+      "Bash(./target/debug/nhs-number-cli --line-validation *)",
+      "Bash(chmod +x examples/11-flag-demo/run.sh)",
+      "Bash(./examples/11-flag-demo/run.sh)"
     ]
   }
 }

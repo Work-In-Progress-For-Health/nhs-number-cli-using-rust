@@ -18,7 +18,8 @@ which is the default and which most callers want.
 
 | Flag                       | Effect                                                                |
 | -------------------------- | --------------------------------------------------------------------- |
-| `-l`, `--line-validation`  | Run the line-validation subcommand explicitly. Same effect as no flag at present; reserved for forward-compatibility once other subcommands exist. |
+| `-l`, `--line-validation`  | Run the line-validation subcommand explicitly. Same effect as no flag. Mutually exclusive with `--counts`. |
+| `-c`, `--counts`           | Run the counts subcommand: read stdin, emit a four-row summary (`valid`, `invalid`, `parse-error`, `blank`) on stdout, write nothing to stderr. Mutually exclusive with `--line-validation`. See [`examples/09-counts-summary/`](../../examples/09-counts-summary/). |
 | `--test`                   | Print the parsed `Args` struct and resolved log level on `stdout` before running. Diagnostic only — do not pipe `--test` output into another tool. |
 | `-v…`, `--verbose…`        | Increase log verbosity. Count → level: 1=error, 2=warn, 3=info, 4=debug, 5=trace. Logs go to `stderr` via `env_logger`. |
 | `-V`, `--version`          | Print the crate version and exit.                                     |
@@ -29,11 +30,13 @@ public API. See [`spec.md`](../../spec.md) FR-13.
 
 ## Subcommand dispatch
 
-The binary supports a single subcommand today (`check_lines`, the
-line-validation filter). Future subcommands will each be opt-in via
-their own flag; the no-flag default behaviour will not change. See
+The binary supports two subcommands today: `check_lines` (the
+default line-validation filter) and `counts` (`--counts`, summary
+mode). They are mutually exclusive at the clap layer. Future
+subcommands will each be opt-in via their own flag; the no-flag
+default behaviour will not change. See
 [Architecture § subcommands](../architecture/index.md) and
-[`spec.md`](../../spec.md) FR-16.
+[`spec.md`](../../spec.md) FR-16 / FR-17.
 
 ## Input
 

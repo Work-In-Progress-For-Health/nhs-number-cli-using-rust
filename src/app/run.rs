@@ -32,11 +32,16 @@ pub(crate) fn run() -> Result<(), Error> {
 ///
 /// Default behaviour with no subcommand flag is the line validator,
 /// so callers who do nothing more than `cat input.txt | nhs-number-cli`
-/// keep working. Set `args.check_lines = Some(false)` to suppress it
-/// (currently not expressible via the CLI).
+/// keep working. Explicit flags pick a non-default subcommand:
+/// `--counts` runs `subcommands::counts`, and `--line-validation` is
+/// the explicit form of the default. The flags are mutually exclusive
+/// at the clap layer; this function honours that by checking `counts`
+/// first.
 fn dispatch(args: &Args) {
     trace!("dispatch");
-    if args.check_lines.unwrap_or(true) {
+    if args.counts.unwrap_or(false) {
+        crate::subcommands::counts::counts();
+    } else if args.check_lines.unwrap_or(true) {
         crate::subcommands::check_lines::check_lines();
     }
 }

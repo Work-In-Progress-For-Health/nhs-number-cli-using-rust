@@ -32,6 +32,13 @@ pub fn app() -> Command {
         .short('l')
         .long("line-validation")
         .action(clap::ArgAction::SetTrue)
+        .conflicts_with("counts")
+    )
+    .arg(Arg::new("counts")
+        .help("Read lines from stdin and print a summary count of valid, invalid, parse-error, and blank lines on stdout.\nExample: --counts")
+        .short('c')
+        .long("counts")
+        .action(clap::ArgAction::SetTrue)
     )
     .arg(Arg::new("test")
         .help("Print test output for debugging, verifying, tracing, and the like.\nExample: --test")
@@ -64,10 +71,16 @@ pub fn args() -> Args {
     } else {
         None
     };
+    let counts = if matches.get_flag("counts") {
+        Some(true)
+    } else {
+        None
+    };
     Args {
         test,
         log_level,
         check_lines,
+        counts,
     }
 }
 
@@ -184,6 +197,18 @@ mod tests {
             &*COMMAND_OS,
             &["--test", "--line-validation"],
             r#" check_lines: Some(true)"#
+        );
+    }
+
+    /// Test that the `--counts` argument is parsed into
+    /// `Args::counts`. The `--test` argument prints the `Args`
+    /// struct to stdout so we can assert on its `Debug` form.
+    #[test]
+    fn test_counts() {
+        assert_program_args_stdout_string_contains!(
+            &*COMMAND_OS,
+            &["--test", "--counts"],
+            r#" counts: Some(true)"#
         );
     }
 }
