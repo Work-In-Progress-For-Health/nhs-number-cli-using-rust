@@ -47,12 +47,11 @@ jobs:
       - name: cargo test
         run: cargo test
 
-      # The example run.sh scripts assume a POSIX shell and a
-      # `target/debug/nhs-number-cli` (no `.exe`) path. Windows
-      # support for `examples/run-all.sh` is tracked as a separate
-      # work item; for now we only exercise it on Linux and macOS.
+      # The example run.sh scripts retry the binary path with a
+      # `.exe` suffix when the bare path is not executable, so they
+      # work on Windows under Git Bash. `.gitattributes` keeps
+      # them LF on every checkout.
       - name: ./examples/run-all.sh
-        if: runner.os != 'Windows'
         shell: bash
         run: |
           cargo build

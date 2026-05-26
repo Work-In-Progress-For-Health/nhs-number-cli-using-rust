@@ -138,12 +138,12 @@ and runs:
 * `cargo fmt -- --check`
 * `cargo clippy --all-targets -- -D warnings`
 * `cargo test`
-* `./examples/run-all.sh` (Linux + macOS only — Windows skipped
-  pending WI-11 in `spec.md`)
+* `./examples/run-all.sh` (under `shell: bash` on every OS — Git
+  Bash on Windows runners; each `run.sh` retries `target/debug/
+  nhs-number-cli` with a `.exe` suffix; `.gitattributes` keeps the
+  scripts and fixtures LF-only on Windows checkouts).
 
-A red Windows job for the examples step does **not** count as
-failure today, but `cargo test`'s coverage of FR-2/7/9/11/12 means
-the contract is still gated on Windows. Run the same four commands
-locally before pushing — relying on CI to find drift slows reviews.
+Run the same four commands locally before pushing — relying on CI
+to find drift slows reviews.
 
 <!-- cSpell:ignore assertables LazyLock -->

@@ -1,0 +1,19 @@
+# Shell scripts must use LF line endings even on Windows checkouts
+# (`git config core.autocrlf=true` is the Windows default). Without
+# this, `sh` on Linux/macOS/Git-Bash refuses to run scripts whose
+# shebang line is `#!/usr/bin/env sh\r`.
+*.sh text eol=lf
+
+# Example fixtures: the runnable examples diff observed output
+# against committed expected-* files byte-for-byte, so the expected
+# files must keep their committed line endings regardless of the
+# checkout platform.
+examples/**/expected-*.txt text eol=lf
+examples/**/input.txt      text eol=lf
+examples/**/good.txt       text eol=lf
+examples/**/bad.txt        text eol=lf
+examples/**/patients.csv   text eol=lf
+
+# 08-crlf-windows deliberately ships a CRLF-terminated input file.
+# Override the rules above so Git doesn't normalise it on checkout.
+examples/08-crlf-windows/input-crlf.txt -text

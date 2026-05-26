@@ -816,12 +816,6 @@ following hold:
 These are deliberate divergences between the spec and the code at
 the time of writing. Each is tracked toward closure in § 15.
 
-* **`./examples/run-all.sh` is POSIX-shell only.** The shell harness
-  hardcodes `target/debug/nhs-number-cli` (no `.exe` suffix) and uses
-  shell features that don't have direct cmd.exe equivalents. CI skips
-  the step on Windows. Either teach the `run.sh` scripts to append
-  `.exe` when present, or replace the harness with a Rust test binary
-  that re-uses `tests/test.rs`'s `Run` helper. (Work item: WI-11.)
 
 ## 12. Change management
 
@@ -885,9 +879,8 @@ replaces what would otherwise live in a `plan.md`.
 
 ### Near term (next minor release, v0.4.0)
 
-1. **Windows examples coverage.** Make `examples/run-all.sh` (or a
-   replacement) executable on Windows so the CI Windows job runs the
-   same set of checks as Linux/macOS. → WI-11.
+*(All near-term v0.4.0 roadmap items have landed in v0.3.x — see
+the work items section.)*
 
 ### Medium term (v0.5.x – v0.9.x)
 
@@ -921,7 +914,7 @@ spec entries. This section replaces what would otherwise live in a
 | ID    | Title                                                              | Status      | Touches                                       |
 | ----- | ------------------------------------------------------------------ | ----------- | --------------------------------------------- |
 | WI-1  | Add `.github/workflows/ci.yml` for fmt/clippy/test/examples        | Done in v0.3.x | `.github/workflows/ci.yml`; matrix over ubuntu/macos/windows |
-| WI-11 | Make `./examples/run-all.sh` Windows-compatible (or replace it)    | Planned     | `examples/*/run.sh`, `examples/run-all.sh`, CI job |
+| WI-11 | Make `./examples/run-all.sh` Windows-compatible (or replace it)    | Done in v0.3.x | `examples/*/run.sh` (`.exe` fallback); `.gitattributes`; `.github/workflows/ci.yml` (Windows skip removed) |
 | WI-2  | Remove `src/app/testing.rs` once nothing imports it                | Done in v0.3.x | `src/app/testing.rs` (deleted); `src/app/mod.rs` |
 | WI-3  | Regenerate `llms.txt` and `llms.json` from current `src/`          | Done in v0.3.x | `llms.txt`, `llms.json`; `docs/development/index.md` § Regenerating |
 | WI-4  | Runnable examples for `--verbose`, `--test`, configuration         | Done in v0.3.x via `examples/11-flag-demo/` | `examples/11-flag-demo/`; NFR-10 |
@@ -984,6 +977,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-26 | `--counts` subcommand emits a four-row summary                            | Closes WI-7; adds FR-17. Mutually exclusive with `--line-validation` at the clap layer; no-flag default behaviour unchanged. Replaces the shell wrapper that powered `examples/09-counts-summary/`.|
 | 2026-05-26 | `--column N` selects a comma-separated field from each row                | Closes WI-8; adds FR-18. Honoured by both subcommands. Simple literal-byte split; quoted-CSV is out of scope (use `xsv` upstream). Replaces the `cut -d,` pipeline in `examples/06-csv-column/`.   |
 | 2026-05-26 | `--format text\|json\|tsv` for diagnostics and counts summary             | Closes WI-9; adds FR-19. `text` default preserves FR-10 byte-for-byte. JSON is hand-rolled (no serde_json) to keep the dependency closure small per NFR-7. New runnable example `examples/12-format-output/`. |
+| 2026-05-26 | Runnable examples run on Windows in CI                                    | Closes WI-11. Each `run.sh` retries `target/debug/nhs-number-cli` with a `.exe` suffix; `.gitattributes` keeps shell scripts and fixtures LF-only (except `08-crlf-windows/input-crlf.txt` which is `-text` to preserve its CRLF). CI Windows job now runs `./examples/run-all.sh`. |
 
 ---
 

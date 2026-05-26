@@ -4,6 +4,7 @@ set -eu
 
 here="$(cd "$(dirname "$0")" && pwd)"
 bin="$here/../../target/debug/nhs-number-cli"
+[ -x "$bin" ] || bin="${bin}.exe"
 
 if [ ! -x "$bin" ]; then
   echo "Binary not found at $bin — run 'cargo build' first." >&2
