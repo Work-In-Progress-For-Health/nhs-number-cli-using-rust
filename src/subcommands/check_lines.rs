@@ -1,4 +1,5 @@
-use crate::subcommands::pick_column;
+use crate::app::args::Format;
+use crate::subcommands::{json_escape, pick_column, tsv_escape};
 use nhs_number::NHSNumber;
 use std::io::{self, BufRead};
 use std::str::FromStr;
@@ -12,10 +13,11 @@ pub type LineIndex = usize;
 
 /// Run the line-validation subcommand.
 ///
-/// When `column` is `Some(n)`, each non-blank input line is split on
-/// `,` and the n-th (1-based) field is taken as the candidate NHS
-/// Number. When `None`, the whole line is the candidate.
-pub fn check_lines(column: Option<usize>) {
+/// `column` selects a 1-based comma-separated field per row, or
+/// `None` for whole-line input. `format` selects the wire format
+/// of stderr diagnostics; `Format::Text` is the FR-10 stable
+/// contract and the default.
+pub fn check_lines(column: Option<usize>, format: Format) {
     let stdin = io::stdin();
     for (i, line) in stdin.lock().lines().enumerate() {
         match line {
@@ -27,14 +29,7 @@ pub fn check_lines(column: Option<usize>) {
                     Some(n) => match pick_column(&line, n) {
                         Some(s) => s,
                         None => {
-                            eprintln!(
-                                "{}",
-                                Error::Parse {
-                                    line_number: i,
-                                    line: line.clone(),
-                                    error: format!("ColumnMissing({n})"),
-                                }
-                            );
+                            emit_parse(i, &line, &format!("ColumnMissing({n})"), format);
                             continue;
                         }
                     },
@@ -45,37 +40,84 @@ pub fn check_lines(column: Option<usize>) {
                         if nhs_number.validate_check_digit() {
                             println!("{}", nhs_number);
                         } else {
-                            eprintln!(
-                                "{}",
-                                Error::CheckDigit {
-                                    line_number: i,
-                                    nhs_number,
-                                }
-                            );
+                            emit_check_digit(i, &nhs_number, format);
                         }
                     }
                     Err(e) => {
-                        eprintln!(
-                            "{}",
-                            Error::Parse {
-                                line_number: i,
-                                line: line.clone(),
-                                error: format!("{:?}", e),
-                            }
-                        );
+                        emit_parse(i, &line, &format!("{:?}", e), format);
                     }
                 }
             }
             Err(e) => {
-                eprintln!(
-                    "{}",
-                    Error::Io {
-                        line_number: i,
-                        error: e,
-                    }
-                );
+                emit_io(i, &e, format);
             }
         }
+    }
+}
+
+fn emit_check_digit(line_number: LineIndex, nhs_number: &NHSNumber, format: Format) {
+    match format {
+        Format::Text => eprintln!(
+            "{}",
+            Error::CheckDigit {
+                line_number,
+                nhs_number: *nhs_number,
+            }
+        ),
+        Format::Json => eprintln!(
+            r#"{{"kind":"check_digit","line_number":{},"nhs_number":{}}}"#,
+            line_number,
+            json_escape(&nhs_number.to_string()),
+        ),
+        Format::Tsv => eprintln!(
+            "check_digit\t{}\t{}\t\t",
+            line_number,
+            tsv_escape(&nhs_number.to_string()),
+        ),
+    }
+}
+
+fn emit_parse(line_number: LineIndex, line: &str, error: &str, format: Format) {
+    match format {
+        Format::Text => eprintln!(
+            "{}",
+            Error::Parse {
+                line_number,
+                line: line.to_string(),
+                error: error.to_string(),
+            }
+        ),
+        Format::Json => eprintln!(
+            r#"{{"kind":"parse_error","line_number":{},"line":{},"error":{}}}"#,
+            line_number,
+            json_escape(line),
+            json_escape(error),
+        ),
+        Format::Tsv => eprintln!(
+            "parse_error\t{}\t\t{}\t{}",
+            line_number,
+            tsv_escape(line),
+            tsv_escape(error),
+        ),
+    }
+}
+
+fn emit_io(line_number: LineIndex, error: &std::io::Error, format: Format) {
+    let msg = format!("{}", error);
+    match format {
+        Format::Text => eprintln!(
+            "{}",
+            Error::Io {
+                line_number,
+                error: msg,
+            }
+        ),
+        Format::Json => eprintln!(
+            r#"{{"kind":"io_error","line_number":{},"error":{}}}"#,
+            line_number,
+            json_escape(&msg),
+        ),
+        Format::Tsv => eprintln!("io_error\t{}\t\t\t{}", line_number, tsv_escape(&msg),),
     }
 }
 
@@ -99,6 +141,6 @@ pub enum Error {
     #[error("Error reading line {line_number}. Error: {error}")]
     Io {
         line_number: LineIndex,
-        error: std::io::Error,
+        error: String,
     },
 }

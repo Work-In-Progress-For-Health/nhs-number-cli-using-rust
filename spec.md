@@ -405,6 +405,7 @@ public API.
 | `-l`, `--line-validation`  | Run the line-validation subcommand (the default behaviour).           |
 | `-c`, `--counts`           | Run the counts subcommand. Mutually exclusive with `--line-validation`. |
 | `--column N`               | Split each input line on `,` and take the N-th (1-based) field as the candidate. Whole-line behaviour is the default. |
+| `--format text\|json\|tsv` | Output format for diagnostics (line-validation) and the counts summary (`--counts`). `text` is the default and the FR-10 stable contract. |
 | `--test`                   | Print the parsed `Args` and log level to `stdout` for diagnostics.    |
 | `-v…`, `--verbose…`        | Increase log verbosity. Count → level: 1=error, 2=warn, 3=info, 4=debug, 5=trace. |
 | `-V`, `--version`          | Print the crate version. Handled by clap.                             |
@@ -565,6 +566,49 @@ candidate is the whole line.
 `src/app/clap.rs` (`--column` flag); `src/app/run.rs` (`dispatch`);
 `tests/test.rs::fr_18_column_extraction`;
 `examples/06-csv-column/`.
+
+---
+
+### FR-19 — Output format selector
+
+**Statement.** `--format text|json|tsv` selects the wire format of
+the line-validation diagnostic stream (stderr) and the counts
+summary (stdout, when `--counts` is given). Stdout from the
+line-validation subcommand (canonical NHS Numbers) is unaffected
+and is plain text in every format.
+
+**Acceptance criteria.**
+
+* `text` (default) preserves the FR-10 byte-for-byte stable
+  contract on stderr, and the four key/value rows on stdout for
+  `--counts`. **A green default `cargo run < input.txt` must be
+  byte-identical to its v0.3.x baseline.**
+* `json` emits one JSON object per diagnostic line (NDJSON), with
+  three `kind` values: `check_digit`, `parse_error`, `io_error`.
+  String fields use the standard JSON escape rules (`"`, `\`,
+  `\n`, `\r`, `\t`, and `\u00XX` for the C0 control range).
+* `tsv` emits a fixed five-column schema —
+  `kind` `\t` `line_number` `\t` `nhs_number` `\t` `line` `\t` `error` —
+  with empty fields where they don't apply. Tab and newline are
+  replaced with single space in each field; no quoting.
+* For `--counts`, `json` emits a single JSON object
+  `{"valid":n,"invalid":n,"parse_error":n,"blank":n}`; `tsv`
+  emits a header row of column names followed by a single row of
+  integer counts.
+* The JSON output is hand-formatted (no `serde_json` dependency).
+  Acceptable because the message shapes are fixed and the escape
+  rules are limited; see `src/subcommands/mod.rs::json_escape`.
+
+**Status.** Implemented.
+
+**Traceability.** `src/app/args.rs::Format`; `src/app/clap.rs`
+(`--format` arg); `src/subcommands/mod.rs::{json_escape,
+tsv_escape}` and their unit tests;
+`src/subcommands/check_lines.rs::{emit_check_digit, emit_parse,
+emit_io}`; `src/subcommands/counts.rs`;
+`tests/test.rs::{fr_19_format_json, fr_19_format_tsv,
+fr_19_counts_format_json, fr_19_default_text_unchanged}`;
+`examples/12-format-output/`.
 
 ---
 
@@ -821,6 +865,7 @@ the time of writing. Each is tracked toward closure in § 15.
 | FR-16       | `src/app/run.rs` (`dispatch`), `src/subcommands/mod.rs` | `tests/test.rs` (no-flag default), `src/app/clap.rs::test_check_lines` (explicit flag) | all                                   | `docs/usage/index.md` § Subcommand dispatch, `AGENTS/architecture.md` |
 | FR-17       | `src/subcommands/counts.rs`, `src/app/clap.rs` (`--counts`) | `tests/test.rs::fr_17_counts_summary`, `src/app/clap.rs::test_counts` | `examples/09-counts-summary/`         | `docs/usage/index.md` § Flags, `AGENTS/behavioural-contract.md` |
 | FR-18       | `src/subcommands/mod.rs::pick_column`, `src/subcommands/check_lines.rs`, `src/subcommands/counts.rs`, `src/app/clap.rs` (`--column`) | `tests/test.rs::fr_18_column_extraction` | `examples/06-csv-column/`             | `docs/usage/index.md` § Flags |
+| FR-19       | `src/app/args.rs::Format`, `src/subcommands/mod.rs::{json_escape, tsv_escape}`, `src/subcommands/check_lines.rs::emit_*`, `src/subcommands/counts.rs`, `src/app/clap.rs` (`--format`) | `tests/test.rs::fr_19_*` (4 tests) + unit tests for `json_escape` / `tsv_escape` / `pick_column` | `examples/12-format-output/`          | `docs/usage/index.md` § Flags, `AGENTS/behavioural-contract.md` |
 | NFR-1       | `BufRead::lines` iterator                       | (constant-memory not currently asserted)  | n/a                                   | `docs/architecture/index.md`                                  |
 | NFR-2       | `Cargo.toml` (no platform-specific deps)        | manual cross-build                        | n/a                                   | `docs/installation/index.md`                                  |
 | NFR-3       | overall design                                  | `tests/test.rs`                           | `examples/06-csv-column/`             | `docs/usage/index.md`                                         |
@@ -853,9 +898,10 @@ replaces what would otherwise live in a `plan.md`.
 6. **Optional CSV column selection.** ~~A `--column N` (1-based)
    flag that picks the Nth field of a CSV row as the candidate NHS
    Number.~~ **Done.** Landed as FR-18 in v0.3.x. → WI-8.
-7. **Optional structured output.** A `--format json|tsv` flag for
+7. **Optional structured output.** ~~A `--format json|tsv` flag for
    downstream tools that want machine-readable diagnostics. Must
-   not change the default text contract (FR-10). Adds a new FR.
+   not change the default text contract (FR-10).~~ **Done.** Landed
+   as FR-19 in v0.3.x. → WI-9.
 
 ### Long term / speculative (no commitment)
 
@@ -883,7 +929,7 @@ spec entries. This section replaces what would otherwise live in a
 | WI-6  | Crate-integration tests for FR-2, FR-7, FR-9, FR-11, FR-12         | Done in v0.3.x via `tests/test.rs::fr_*` | `tests/test.rs`; § 13 |
 | WI-7  | New FR + impl: `--counts` subcommand                               | Done in v0.3.x via FR-17 | `src/subcommands/counts.rs`; FR-17 |
 | WI-8  | New FR + impl: `--column N` CSV-field selector                     | Done in v0.3.x via FR-18 | `src/subcommands/mod.rs::pick_column`; FR-18 |
-| WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Speculative | new spec entry; `src/subcommands/`; § 14.7    |
+| WI-9  | New FR + impl: `--format json\|tsv` for diagnostics                | Done in v0.3.x via FR-19 | `src/app/args.rs::Format`, `src/subcommands/*`; FR-19 |
 | WI-10 | Remove stray `src/app/.DS_Store` from the working tree (and ignore)| Done in v0.3.x | `.gitignore` (`.DS_Store`, `*.swp`, `*~`)   |
 
 ### Work item template
@@ -937,6 +983,7 @@ A short list of decisions worth preserving the *why* of.
 | 2026-05-26 | Add `.github/workflows/ci.yml` over ubuntu/macos/windows                  | Closes WI-1. Gates every PR on `cargo fmt -- --check`, `cargo clippy -- -D warnings`, `cargo test`, and (Linux/macOS only) `./examples/run-all.sh`. Windows example coverage tracked as WI-11.|
 | 2026-05-26 | `--counts` subcommand emits a four-row summary                            | Closes WI-7; adds FR-17. Mutually exclusive with `--line-validation` at the clap layer; no-flag default behaviour unchanged. Replaces the shell wrapper that powered `examples/09-counts-summary/`.|
 | 2026-05-26 | `--column N` selects a comma-separated field from each row                | Closes WI-8; adds FR-18. Honoured by both subcommands. Simple literal-byte split; quoted-CSV is out of scope (use `xsv` upstream). Replaces the `cut -d,` pipeline in `examples/06-csv-column/`.   |
+| 2026-05-26 | `--format text\|json\|tsv` for diagnostics and counts summary             | Closes WI-9; adds FR-19. `text` default preserves FR-10 byte-for-byte. JSON is hand-rolled (no serde_json) to keep the dependency closure small per NFR-7. New runnable example `examples/12-format-output/`. |
 
 ---
 

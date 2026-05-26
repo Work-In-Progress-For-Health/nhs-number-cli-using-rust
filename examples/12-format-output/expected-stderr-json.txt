@@ -1,0 +1,2 @@
+{"kind":"check_digit","line_number":1,"nhs_number":"999 123 4561"}
+{"kind":"parse_error","line_number":2,"line":"not-an-nhs-number","error":"ParseError"}

@@ -27,4 +27,42 @@ pub struct Args {
     /// Number. When None, the whole line is the candidate. Honoured
     /// by every subcommand that classifies lines.
     pub(crate) column: Option<usize>,
+
+    /// Output format selector. `Text` is the FR-10 stable contract
+    /// (`Error invalid line N. …` on stderr; key/value rows on stdout
+    /// from `--counts`). `Json` and `Tsv` are machine-readable
+    /// alternatives for downstream tooling.
+    pub(crate) format: Format,
+}
+
+/// Output format for diagnostics (line-validation subcommand) and
+/// for the counts summary. Plain stdout from line-validation (the
+/// canonical NHS Numbers) is always text and is not affected.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub enum Format {
+    /// FR-10 stable text format. The default; do not change.
+    #[default]
+    Text,
+    /// One JSON object per diagnostic line (NDJSON). The counts
+    /// summary is a single JSON object.
+    Json,
+    /// Tab-separated values. The line-validation diagnostic stream
+    /// is one row per failure with a fixed five-column schema
+    /// (kind, line_number, nhs_number, line, error). The counts
+    /// summary is one row of column headers followed by one row of
+    /// integer counts.
+    Tsv,
+}
+
+impl Format {
+    /// Map the clap string value to a `Format`. Returns `Text` for
+    /// any unrecognised string; clap's `value_parser` rejects those
+    /// before this function ever sees them.
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "json" => Format::Json,
+            "tsv" => Format::Tsv,
+            _ => Format::Text,
+        }
+    }
 }

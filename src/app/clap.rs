@@ -16,7 +16,7 @@
 //! We favor our convention of doing clap setup in a file named `clap.rs`,
 //! rather than in `main.rs`, because we like the separation of concerns.
 
-use crate::app::args::Args;
+use crate::app::args::{Args, Format};
 use clap::{Arg, Command};
 
 /// Create a clap app.
@@ -45,6 +45,13 @@ pub fn app() -> Command {
         .long("column")
         .value_name("N")
         .value_parser(clap::value_parser!(usize))
+    )
+    .arg(Arg::new("format")
+        .help("Output format for diagnostics and the counts summary.\nDefault: text (FR-10 stable contract).\nJson: one JSON object per diagnostic line (NDJSON), counts summary as one object.\nTsv: tab-separated values.\nExample: --format json")
+        .long("format")
+        .value_name("FORMAT")
+        .value_parser(["text", "json", "tsv"])
+        .default_value("text")
     )
     .arg(Arg::new("test")
         .help("Print test output for debugging, verifying, tracing, and the like.\nExample: --test")
@@ -83,12 +90,17 @@ pub fn args() -> Args {
         None
     };
     let column = matches.get_one::<usize>("column").copied();
+    let format = matches
+        .get_one::<String>("format")
+        .map(|s| Format::from_str(s))
+        .unwrap_or_default();
     Args {
         test,
         log_level,
         check_lines,
         counts,
         column,
+        format,
     }
 }
 

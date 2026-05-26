@@ -32,6 +32,9 @@ directory contains:
 11. [11-flag-demo](./11-flag-demo/) — exercises every public CLI flag
     (`--version`, `--help`, `--line-validation`, `--test`, `--verbose`)
     and the `RUST_LOG` environment variable.
+12. [12-format-output](./12-format-output/) — `--format json` and
+    `--format tsv` for machine-readable diagnostics; `text` (the
+    default) preserves the FR-10 stable contract byte-for-byte.
 
 ## Running an example
 

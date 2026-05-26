@@ -186,6 +186,103 @@ fn fr_18_column_extraction() {
     );
 }
 
+/// FR-19 — `--format json` emits NDJSON diagnostics on stderr.
+/// Stdout (valid numbers) is unchanged.
+#[test]
+fn fr_19_format_json() {
+    let mut command = Command::new(&*COMMAND_OS)
+        .args(["--format", "json"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    if let Some(mut stdin) = command.stdin.take() {
+        stdin
+            .write_all(b"999 999 9999\n999 123 4561\nnot-an-nhs-number\n")
+            .unwrap();
+    }
+    let output = command.wait_with_output().unwrap();
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "999 999 9999\n");
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    let lines: Vec<&str> = stderr.lines().collect();
+    assert_eq!(lines.len(), 2);
+    assert!(
+        lines[0].starts_with(r#"{"kind":"check_digit","line_number":1"#)
+            && lines[0].contains(r#""nhs_number":"999 123 4561""#),
+        "got: {}",
+        lines[0]
+    );
+    assert!(
+        lines[1].starts_with(r#"{"kind":"parse_error","line_number":2"#)
+            && lines[1].contains(r#""line":"not-an-nhs-number""#),
+        "got: {}",
+        lines[1]
+    );
+}
+
+/// FR-19 — `--format tsv` emits five-column TSV rows on stderr.
+#[test]
+fn fr_19_format_tsv() {
+    let mut command = Command::new(&*COMMAND_OS)
+        .args(["--format", "tsv"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    if let Some(mut stdin) = command.stdin.take() {
+        stdin
+            .write_all(b"999 999 9999\n999 123 4561\nnot-an-nhs-number\n")
+            .unwrap();
+    }
+    let output = command.wait_with_output().unwrap();
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "999 999 9999\n");
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    let lines: Vec<&str> = stderr.lines().collect();
+    assert_eq!(lines.len(), 2);
+    assert_eq!(lines[0], "check_digit\t1\t999 123 4561\t\t");
+    assert_eq!(lines[1], "parse_error\t2\t\tnot-an-nhs-number\tParseError");
+}
+
+/// FR-19 — `--counts --format json` emits a single JSON object
+/// summary on stdout.
+#[test]
+fn fr_19_counts_format_json() {
+    let mut command = Command::new(&*COMMAND_OS)
+        .args(["--counts", "--format", "json"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    if let Some(mut stdin) = command.stdin.take() {
+        stdin
+            .write_all(b"999 999 9999\n\n999 123 4561\nnot-an-nhs-number\n")
+            .unwrap();
+    }
+    let output = command.wait_with_output().unwrap();
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert_eq!(
+        stdout.trim_end(),
+        r#"{"valid":1,"invalid":1,"parse_error":1,"blank":1}"#
+    );
+    assert!(output.stderr.is_empty());
+}
+
+/// FR-19 (default) — without `--format`, the FR-10 text contract is
+/// preserved byte-for-byte. Guards against accidental format-flag
+/// leakage when `--format text` is the default.
+#[test]
+fn fr_19_default_text_unchanged() {
+    let run = run_with_stdin(b"999 999 9999\n999 123 4561\n");
+    assert_eq!(run.stdout_lines(), vec!["999 999 9999"]);
+    let stderr = run.stderr_lines();
+    assert_eq!(stderr.len(), 1);
+    assert!(stderr[0].starts_with("Error invalid line 1."));
+    assert!(stderr[0].ends_with("999 123 4561"));
+}
+
 /// FR-17 — `--counts` emits a four-row summary to stdout and
 /// nothing to stderr. The default (no flag) and `--line-validation`
 /// behaviour must be unchanged; only the explicit flag opts in.
