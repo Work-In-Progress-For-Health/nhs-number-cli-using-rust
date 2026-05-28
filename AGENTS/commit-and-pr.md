@@ -92,19 +92,25 @@ Semantic versioning, with one extra rule:
 ## Releases
 
 1. Update `version` in `Cargo.toml`.
-2. Update [`../spec.md`](../spec.md): bump the document version header
+2. Move [`../CHANGELOG.md`](../CHANGELOG.md)'s `## [Unreleased]`
+   block under a new `## [vX.Y.Z] — YYYY-MM-DD` heading and add a
+   fresh empty `## [Unreleased]` block at the top of the file. Also
+   add a new link reference at the bottom for the version. The
+   `[Unreleased]` ↔ `vX.Y.Z` compare URL gets a stub until the tag
+   is pushed; that's expected.
+3. Update [`../spec.md`](../spec.md): bump the document version header
    and "Last reviewed" date, and mark any spec lines whose status
    changed.
-3. Run the full pre-commit checklist.
-4. Commit: `Release vX.Y.Z`.
-5. Tag: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`.
-6. Push: `git push && git push --tags`.
-7. Build the Windows GNU binary (if you have the toolchain):
+4. Run the full pre-commit checklist.
+5. Commit: `Release vX.Y.Z`.
+6. Tag: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`.
+7. Push: `git push && git push --tags`.
+8. Build the Windows GNU binary (if you have the toolchain):
    ```sh
    cargo build --release --target x86_64-pc-windows-gnu
    ```
    Commit the resulting `nhs-number-cli.exe`.
-8. (Optional) `cargo publish` to crates.io once the crate is
+9. (Optional) `cargo publish` to crates.io once the crate is
    published.
 
 ## Don't do these
