@@ -125,15 +125,14 @@ mod tests {
         assert_program_args_stdout_string_contains!(&*COMMAND_OS, &["--test"], r#"Args { "#);
     }
 
-    /// Test that the special argument `--verbose` is working.
-    ///
-    /// This test must succeed in order for any of the rest of the tests here to
-    /// show diagnostics, because the `--verbose` argument turns on logging output,
-    /// which can include debugging messages, warnings, errors, and so on.
+    /// Test that the `--verbose` count maps onto `Args::log_level`
+    /// exactly as documented in `spec.md` § FR-13. Both the short
+    /// form (`-v`, `-vv`, …) and the long form (`--verbose`,
+    /// `--verbose --verbose`, …) must produce the same level.
     ///
     /// Example:
     ///
-    ///     sita --verbose
+    ///     nhs-number-cli --test -vv
     ///
     #[test]
     fn test_verbose() {
@@ -201,15 +200,14 @@ mod tests {
         );
     }
 
-    /// Test that the special argument `--verbose` is working.
-    ///
-    /// This test must succeed in order for any of the rest of the tests here to
-    /// show diagnostics, because the `--verbose` argument turns on logging output,
-    /// which can include debugging messages, warnings, errors, and so on.
+    /// Test that the `--line-validation` flag is parsed into
+    /// `Args::check_lines = Some(true)`. The `--test` flag prints
+    /// the `Args` struct to stdout via `{:?}` so the assertion can
+    /// see the field value.
     ///
     /// Example:
     ///
-    ///     sita --verbose
+    ///     nhs-number-cli --test --line-validation
     ///
     #[test]
     fn test_check_lines() {

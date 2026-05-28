@@ -70,14 +70,11 @@ pub enum Error {
     Confy(::confy::ConfyError),
 }
 
-#[cfg(test)]
-mod tests {
-    //use super::*;
-
-    #[test]
-    fn test_run() {
-        //TODO
-    }
-}
-
 // cSpell:ignore confy
+//
+// `run()` itself is not unit-testable in isolation: it pulls
+// process-level `stdin` via `confy::load` and `std::io::stdin()` and
+// hands off to the subcommand dispatch. The end-to-end behaviour is
+// exercised by `tests/test.rs` (which spawns the compiled binary as
+// a subprocess) and by every `examples/*/run.sh`. Don't add an
+// empty unit-test module here just to have one.

@@ -867,7 +867,7 @@ the time of writing. Each is tracked toward closure in § 15.
 | NFR-5       | `examples/README.md`                            | code review                               | all                                   | `AGENTS/avoid.md`                                             |
 | NFR-6       | `Cargo.toml` `license`                          | `cargo license` (manual)                  | n/a                                   | `AGENTS/dependencies.md`                                      |
 | NFR-7       | `Cargo.toml`                                    | `cargo machete` (manual)                  | n/a                                   | `AGENTS/dependencies.md`                                      |
-| NFR-8       | absence of clock/random/hash on output path     | (TBD: byte-for-byte fixture)              | all                                   | `AGENTS/behavioural-contract.md`                              |
+| NFR-8       | absence of clock/random/hash on output path     | every `examples/*/run.sh` is a byte-for-byte `diff -u` against committed fixtures, so a non-deterministic output path would fail `./examples/run-all.sh` on the first regression | all                                   | `AGENTS/behavioural-contract.md`                              |
 | NFR-9       | `edition = "2024"`                              | build                                     | n/a                                   | `docs/installation/index.md`, `docs/development/index.md`     |
 | NFR-10      | this file                                       | n/a                                       | n/a                                   | every doc                                                     |
 
