@@ -16,8 +16,8 @@ Modulus 11 check digit for the first nine digits. Possible causes:
   digits long.
 
 Recalculate the check digit by hand with the algorithm in
-[About NHS Numbers](./about-nhs-numbers.md#check-digit) or use another
-tool to cross-check.
+[About NHS Numbers](../about-nhs-numbers/index.md#check-digit) or use
+another tool to cross-check.
 
 ## "Error parsing line"
 
@@ -28,10 +28,24 @@ Error parsing line 3. Error: ParseError. Line: not-an-nhs-number
 The input does not contain ten digits (ignoring whitespace). Common
 causes:
 
-* Extra columns (e.g. passing a whole CSV row instead of a single field).
+* Extra columns (e.g. passing a whole CSV row instead of a single field
+  — pick a field with `--column N`).
 * Line endings included (rare, but possible with exotic encodings).
 * A header row passed by mistake. Use `tail -n +2` to skip it.
 * A comment or empty marker character such as `-` or `N/A`.
+
+## "Error parsing line ... Error: ColumnMissing(N) ..."
+
+```
+Error parsing line 5. Error: ColumnMissing(3). Line: 6,short-row
+```
+
+The `--column N` flag asked for the *N*-th comma-separated field, but
+the input row had fewer than *N* fields. Either the row is genuinely
+short (a malformed CSV) or you picked the wrong column index. Note
+that with `--column`, the `Line:` payload contains the *whole* input
+row, not just the selected field — useful for tracing the row back to
+its source.
 
 ## CRLF line endings
 
@@ -62,9 +76,11 @@ sed 's/[[:space:]]*$//' < input.txt | nhs-number-cli
 
 ## The binary runs but exits with status 0 despite invalid numbers
 
-This is by design. See [Usage § exit status](./usage.md#exit-status). If
-you need a non-zero exit on error, wrap the call in a script that
-inspects the `stderr` stream.
+This is by design. See
+[Usage § exit status](../usage/index.md#exit-status). If you need a
+non-zero exit on error, wrap the call in a script that inspects the
+`stderr` stream — `examples/07-fail-on-invalid/validate-strict.sh`
+is one such wrapper.
 
 ## `cargo build` fails with "edition = 2024" error
 
