@@ -42,6 +42,7 @@ behavioural specification start at [`spec.md`](./spec.md).
 | ---------------------------------- | --------------------------------------------- |
 | [`Cargo.toml`](./Cargo.toml)       | Crate manifest. Pinned dependency versions.   |
 | [`Cargo.lock`](./Cargo.lock)       | Locked transitive dependencies.               |
+| [`CHANGELOG.md`](./CHANGELOG.md)   | What changed in each released version.        |
 | [`CITATION.cff`](./CITATION.cff)   | How to cite this software.                    |
 | [`cspell.json`](./cspell.json)     | Spell-check allow-list.                       |
 
